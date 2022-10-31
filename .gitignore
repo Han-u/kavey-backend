@@ -1,7 +1,3 @@
-# Project exclude paths
-/.gradle/
-/.idea/
-
 HELP.md
 .gradle
 build/
