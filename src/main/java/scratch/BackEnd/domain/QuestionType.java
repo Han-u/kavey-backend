@@ -2,9 +2,7 @@ package scratch.BackEnd.domain;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -16,6 +14,10 @@ public class QuestionType {
 
     @Id
     private Long questionTypeId;
+
+    @ManyToOne
+    @JoinColumn(name="question_id")
+    private Question question;
 
     @Column(nullable = false)
     private String typeName;

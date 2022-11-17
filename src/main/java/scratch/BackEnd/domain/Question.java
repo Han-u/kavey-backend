@@ -5,6 +5,8 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -24,6 +26,10 @@ public class Question {
     @ManyToOne
     @JoinColumn(name="survey_id")
     private Survey survey;
+
+    @OneToMany(mappedBy="question")
+    private List<QuestionType> questionTypes = new ArrayList<>();
+
     private String title;
     private String ordering;
     private boolean isDeleted = Boolean.FALSE;
