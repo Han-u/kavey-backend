@@ -13,8 +13,8 @@
 //import org.springframework.web.client.RestTemplate;
 //import scratch.BackEnd.domain.KakaoProfile;
 //import scratch.BackEnd.domain.OauthToken;
-//import scratch.BackEnd.domain.User;
-//import scratch.BackEnd.domain.UserRepository;
+//import scratch.BackEnd.domain.User.User;
+//import scratch.BackEnd.domain.User.UserRepository;
 //
 //@Service
 //public class UserService {

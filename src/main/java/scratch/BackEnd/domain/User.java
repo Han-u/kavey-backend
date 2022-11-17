@@ -3,6 +3,8 @@ package scratch.BackEnd.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,13 +16,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @OneToMany(mappedBy= "user")
+    private List<Survey> surveys = new ArrayList<>(); // 읽기만 가능
     private Long kakaoid;
-
-    @Column
     private String nickname ;
-
-    @Column
     private String email;
 
     @Builder
