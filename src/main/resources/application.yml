@@ -1,9 +1,12 @@
+server:
+  port: 8081
+
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/scratch?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: root
-    password: 1234 # 각자 mysql password 설정하세용
+    url: jdbc:mysql://210.109.60.99:10102/surveydb
+    username: admin
+    password: password123 # 각자 mysql password 설정하세용
 
   jpa:
     hibernate:
