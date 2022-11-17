@@ -19,5 +19,5 @@ public class QuestionOption {
     @JoinColumn(name="qeustion_id")
     private Question question;
     private String value; //보기
-    private String order;
+    private String ordering;
 }
