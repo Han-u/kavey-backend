@@ -20,7 +20,8 @@ public class SurveyAttend {
     private Survey survey;
 
     private String sendEmail;
-    private String status; //응답,미응답,거절
+    @Enumerated(EnumType.STRING)
+    private AttendStatus status;
     private String responseDate; //설문 응답 시간
     private String sendDate; //설문 보낸 시간
     private String gender; //성별
