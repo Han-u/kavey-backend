@@ -36,7 +36,8 @@ public class Survey {
     private String description;
     private int themeType;
     private int limitPerson; //참여인원
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private SurveyStatus status;
     private boolean isPrivate; //폐쇠,개방
     private boolean askGender; //성별포함
     private boolean askAge; //나이포함
