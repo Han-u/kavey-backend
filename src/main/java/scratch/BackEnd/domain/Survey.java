@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -17,6 +18,7 @@ import java.util.List;
 @Builder
 @Where(clause = "is_deleted = true")
 @SQLDelete(sql= "UPDATE survey SET is_deleted=true WHERE surveyId = ?")
+@ToString
 public class Survey {
 
     @Id
@@ -34,6 +36,7 @@ public class Survey {
     private LocalDateTime surveyEndDate;
     private LocalDateTime earlyEndDate;
     private String description;
+    private int questionNumber;
     private int themeType;
     private int limitPerson; //참여인원
     @Enumerated(EnumType.STRING)
@@ -43,4 +46,18 @@ public class Survey {
     private boolean askAge; //나이포함
     private boolean isDeleted = Boolean.FALSE;
 
+    @Builder
+    public Survey(User user, String title, String description, boolean ask_age,
+                  boolean ask_gender, boolean is_private, int limit_person, LocalDateTime start_date, LocalDateTime end_date, int question_number) {
+        this.user = user;
+        this.title = title;
+        this.description = description;
+        this.askAge = ask_age;
+        this.askGender = ask_gender;
+        this.isPrivate = is_private;
+        this.limitPerson = limit_person;
+        this.surveyStartDate = start_date;
+        this.surveyEndDate = end_date;
+        this.questionNumber = question_number;
+    }
 }

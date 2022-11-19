@@ -17,6 +17,7 @@ import java.util.List;
 @Builder
 @Where(clause = "is_deleted = true")
 @SQLDelete(sql= "UPDATE question SET is_deleted=true WHERE questionId = ?")
+@ToString
 public class Question {
 
     @Id
@@ -35,4 +36,12 @@ public class Question {
     private boolean isDeleted = Boolean.FALSE;
     private String isRequried;
 
+    @Builder
+    public Question(Survey survey, QuestionType questionType, String title, String ordering, String isRequried) {
+        this.survey = survey;
+        this.questionTypes = questionTypes;
+        this.title = title;
+        this.ordering = ordering;
+        this.isRequried = isRequried;
+    }
 }
