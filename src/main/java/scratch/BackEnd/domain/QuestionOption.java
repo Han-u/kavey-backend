@@ -17,7 +17,14 @@ public class QuestionOption {
 
     @ManyToOne
     @JoinColumn(name="qeustion_id")
-    private Question question;
+    private SurveyQuestion surveyQuestion;
     private String value; //보기
-    private String ordering;
+    private int ordering;
+
+    @Builder
+    public QuestionOption(SurveyQuestion question, String value, int ordering) {
+        this.surveyQuestion = question;
+        this.value = value;
+        this.ordering = ordering;
+    }
 }

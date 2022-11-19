@@ -18,7 +18,7 @@ public class AnswerSub {
 
     @OneToOne
     @JoinColumn(name="qestion_id")
-    private Question question;
+    private SurveyQuestion surveyQuestion;
 
     @ManyToOne
     @JoinColumn(name="user_id")

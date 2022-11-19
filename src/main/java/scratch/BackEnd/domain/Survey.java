@@ -8,7 +8,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Entity
 @Getter
@@ -29,7 +28,7 @@ public class Survey {
     private User user;
 
     @OneToMany(mappedBy= "survey")
-    private List<Question> questions = new ArrayList<>(); // 읽기만 가능
+    private List<SurveyQuestion> surveyQuestions = new ArrayList<>(); // 읽기만 가능
 
     private String title;
     private LocalDateTime surveyStartDate;

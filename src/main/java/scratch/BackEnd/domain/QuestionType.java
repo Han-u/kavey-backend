@@ -17,7 +17,7 @@ public class QuestionType {
 
     @ManyToOne
     @JoinColumn(name="question_id")
-    private Question question;
+    private SurveyQuestion surveyQuestion;
 
     @Column(nullable = false)
     private String typeName;

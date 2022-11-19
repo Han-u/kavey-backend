@@ -18,7 +18,7 @@ import java.util.List;
 @Where(clause = "is_deleted = true")
 @SQLDelete(sql= "UPDATE question SET is_deleted=true WHERE questionId = ?")
 @ToString
-public class Question {
+public class SurveyQuestion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,20 +28,23 @@ public class Question {
     @JoinColumn(name="survey_id")
     private Survey survey;
 
-    @OneToMany(mappedBy="question")
+    @OneToMany(mappedBy= "surveyQuestion")
     private List<QuestionType> questionTypes = new ArrayList<>();
 
     private String title;
-    private String ordering;
+    private int ordering;
     private boolean isDeleted = Boolean.FALSE;
-    private String isRequried;
+    private boolean isRequried;
+    private int optionNumber;
 
     @Builder
-    public Question(Survey survey, QuestionType questionType, String title, String ordering, String isRequried) {
+    public SurveyQuestion(Survey survey, QuestionType questionType, String title, int ordering, boolean is_Requried, int optionNumber) {
         this.survey = survey;
-        this.questionTypes = questionTypes;
+//        this.questionTypes = questionType;
         this.title = title;
         this.ordering = ordering;
-        this.isRequried = isRequried;
+        this.isRequried = is_Requried;
+        this.optionNumber = optionNumber;
+
     }
 }

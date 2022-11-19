@@ -17,7 +17,7 @@ public class SurveyController {
     @PostMapping("")
     public String createSurvey(@RequestBody RequestSurveyDto requestSurveyDto){
         //ObjectMapper objectMapper = new ObjectMapper();   //카멜 스네이크 바꾸는거 하기
-        System.out.println(requestSurveyDto.toString());
+        //System.out.println(requestSurveyDto.toString());
         surveyService.makeSurvey(requestSurveyDto);
         return "";
     }
