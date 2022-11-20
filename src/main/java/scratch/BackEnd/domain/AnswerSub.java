@@ -27,4 +27,9 @@ public class AnswerSub {
 //    private Long surveyId;
     private String value; //주관식 답변
 
+    public AnswerSub(SurveyQuestion surveyQuestion, User user, String value){
+        this.surveyQuestion = surveyQuestion;
+        this.user = user;
+        this.value = value;
+    }
 }
