@@ -28,8 +28,14 @@ public class SurveyQuestion {
     @JoinColumn(name="survey_id")
     private Survey survey;
 
-    @OneToMany(mappedBy= "surveyQuestion")
-    private List<QuestionType> questionTypes = new ArrayList<>();
+//    @OneToMany(mappedBy= "surveyQuestion")
+//    private List<QuestionType> questionTypes = new ArrayList<>();
+
+
+    @ManyToOne
+    @JoinColumn(name = "questionTypeID")
+    private QuestionType questionType;
+
 
     private String title;
     private int ordering;
@@ -40,7 +46,7 @@ public class SurveyQuestion {
     @Builder
     public SurveyQuestion(Survey survey, QuestionType questionType, String title, int ordering, boolean is_Requried, int optionNumber) {
         this.survey = survey;
-//        this.questionTypes = questionType;
+        this.questionType = questionType;
         this.title = title;
         this.ordering = ordering;
         this.isRequried = is_Requried;

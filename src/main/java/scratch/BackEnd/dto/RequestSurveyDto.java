@@ -23,7 +23,9 @@ public class RequestSurveyDto {
 	private int limit_person;
 	private LocalDateTime start_date;
 	private LocalDateTime end_date;
+	private int theme;
 	private int question_number;
+
 	private RequestQuestionDto question_list[];
 
 	public Survey toEntity(User user){
@@ -38,6 +40,7 @@ public class RequestSurveyDto {
 				.surveyStartDate(start_date)
 				.surveyEndDate(end_date)
 				.questionNumber(question_number)
+				.themeType(theme)
 				.build();
 	}
 
