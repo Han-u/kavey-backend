@@ -3,12 +3,18 @@ package scratch.BackEnd.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import scratch.BackEnd.domain.*;
+import org.springframework.transaction.annotation.Transactional;
+import scratch.BackEnd.domain.*;
 import scratch.BackEnd.dto.QuestionOptionDto;
 import scratch.BackEnd.dto.RequestQuestionDto;
+import scratch.BackEnd.dto.RequestSubmitSurveyDto;
 import scratch.BackEnd.dto.RequestSurveyDto;
 import scratch.BackEnd.repository.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -18,6 +24,9 @@ public class SurveyService {
     private final QuestionOptionRepository questionOptionRepository;
     private final QuestionTypeRepository questionTypeRepository;
     private final UserRepository userRepository;
+    private final SurveyAttendRepository surveyAttendRepository;
+    private final AnswerSubRepository answerSubRepository;
+    private final AnswerMultiRepository answerMultiRepository;
 
 
     public boolean makeSurvey(RequestSurveyDto requestSurveyDto){
@@ -50,4 +59,103 @@ public class SurveyService {
         return surveyRepository.findAll();
     }
 
+    /**
+     * 설문 참여자가 제출한 설문 응답을 저장한다.
+     */
+    @Transactional
+    public void submitSurvey(RequestSubmitSurveyDto requestSubmitSurveyDto, Long surveyId, String userEmail) {
+        // 1. 해당 설문지 찾기
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
+        User user = userRepository.findByEmail(userEmail);
+        isValidSurvey(survey);
+        hasPermission(survey, userEmail);
+
+        // 2. 각 질문별 저장하기
+        // 2-1. 주관식 저장하기
+        List<AnswerSub> answerSubList = requestSubmitSurveyDto.getSurveySubjectiveTemplates().stream()
+                        .map(e -> {
+                            SurveyQuestion surveyQuestion = surveyQuestionRepository.findByQuestionIdAndSurvey(e.getQuestionId(), survey).orElseThrow(() -> new RuntimeException("BAD REQUEST"));
+                            return new AnswerSub(surveyQuestion, user, e.getValue());
+                        })
+                        .collect(Collectors.toList());
+        answerSubRepository.saveAll(answerSubList);
+
+        // 2-2. 객관식 저장하기
+        List<AnswerMulti> answerMultiList = requestSubmitSurveyDto.getSurveyTemplates().stream()
+                .map(e -> {
+                    SurveyQuestion surveyQuestion = surveyQuestionRepository.findByQuestionIdAndSurvey(e.getQuestionId(), survey).orElseThrow(() -> new RuntimeException("BAD REQUEST2"));
+                    QuestionOption questionOption = questionOptionRepository.findByOptionIdAndSurveyQuestion(e.getOptionId(), surveyQuestion).orElseThrow(() -> new RuntimeException("BAD REQUEST3"));
+                    return new AnswerMulti(surveyQuestion, user, questionOption);
+                })
+                .collect(Collectors.toList());
+        answerMultiRepository.saveAll(answerMultiList);
+
+        // 3. attend 테이블 업데이트하기
+        Optional<SurveyAttend> surveyAttend = surveyAttendRepository.findBySurveyAndSendEmail(survey, userEmail);
+
+        if(surveyAttend.isPresent()) {
+            SurveyAttend userAttendInfo = surveyAttend.get();
+            userAttendInfo.setAge(requestSubmitSurveyDto.getAge());
+            userAttendInfo.setGender(requestSubmitSurveyDto.getGender());
+            userAttendInfo.setStatus(AttendStatus.RESPONSE);
+            surveyAttendRepository.save(userAttendInfo);
+        }else{
+            surveyAttendRepository.save(
+                    SurveyAttend.builder()
+                            .age(requestSubmitSurveyDto.getAge())
+                            .gender(requestSubmitSurveyDto.getGender())
+                            .sendEmail(userEmail)
+                            .status(AttendStatus.RESPONSE)
+                            .survey(survey)
+                            .build()
+            );
+        }
+
+    }
+
+    void isValidSurvey(Survey survey) {
+        // 1-1. 해당 설문에 응답 가능한 날짜인지
+        LocalDateTime startDate = survey.getSurveyStartDate();
+        LocalDateTime endDate = survey.getSurveyEndDate();
+        LocalDateTime now = LocalDateTime.now();
+
+        if(!isBetweenDay(now, startDate, endDate)){
+            throw new RuntimeException("응답 가능한 날짜가 아닙니다.");
+        }
+
+        // 1-2. 해당 설문이 응답 가능한 상태인지
+        SurveyStatus status = survey.getStatus();
+        if (status != SurveyStatus.PROGRESS){
+            throw new RuntimeException("응답 가능한 설문이 아닙니다.");
+        }
+
+    }
+    void hasPermission(Survey survey, String email){
+        Optional<SurveyAttend> surveyAttend = surveyAttendRepository.findBySurveyAndSendEmail(survey, email);
+
+        if (survey.isPrivate()){
+            // 1. 폐쇄형인 경우
+            // 1-1. 해당 설문에 대한 참여 권한이 있는지
+            if (surveyAttend.isPresent()){
+                if (surveyAttend.get().getStatus() != AttendStatus.NONRESPONSE){
+                    throw new RuntimeException("응답할 수 없는 설문입니다.");
+                }
+            }else{
+                throw new RuntimeException("참여권한이 없습니다.");
+            }
+
+        }
+        else{
+            // 2. 오픈형인 경우
+            // 2-1. 참여 제한에 걸려있는지?
+            int participants = surveyAttendRepository.countBySurveyAndStatus(survey, AttendStatus.RESPONSE);
+            if (survey.getLimitPerson() >= participants){
+                throw new RuntimeException("선착순 끝~ 더빨리 움직이셈ㅋㅋ");
+            }
+        }
+    }
+
+    private Boolean isBetweenDay(LocalDateTime targetDate, LocalDateTime from, LocalDateTime to){
+        return (targetDate.isAfter(from) || targetDate.isEqual(from)) && (targetDate.isBefore(to) || targetDate.isEqual(to));
+    }
 }
