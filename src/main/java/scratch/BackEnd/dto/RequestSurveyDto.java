@@ -2,10 +2,10 @@ package scratch.BackEnd.dto;
 
 import lombok.*;
 import scratch.BackEnd.domain.Survey;
+import scratch.BackEnd.domain.SurveyStatus;
 import scratch.BackEnd.domain.User;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,13 +26,14 @@ public class RequestSurveyDto {
 	private int theme;
 	private int question_number;
 
-	private RequestQuestionDto question_list[];
+	private RequestQuestionDto[] question_list;
 
-	public Survey toEntity(User user){
+	public Survey toEntity(User user, SurveyStatus status){
 		return Survey.builder()
 				.user(user)
 				.title(title)
 				.description(description)
+				.status(status)
 				.askAge(ask_age)
 				.askGender(ask_gender)
 				.isPrivate(is_private)

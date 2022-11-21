@@ -21,22 +21,21 @@ public class SurveyService {
 
 
     public boolean makeSurvey(RequestSurveyDto requestSurveyDto){
-
-        //System.out.println(requestSurveyDto.toString());      //질문 is_requuired 자꾸 false로 나오는 이유 찾아내기
+        //설문 생성
         User user = userRepository.findById(requestSurveyDto.getUser_id()).orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다. id = " + requestSurveyDto.getUser_id()));
-        Survey survey = requestSurveyDto.toEntity(user);
+        Survey survey = requestSurveyDto.toEntity(user, SurveyStatus.MAKING);
         Survey surveySaved = surveyRepository.save(survey);
         //System.out.println(surveySaved.toString());
 
-        System.out.println(survey.getQuestionNumber());
+        //질문 생성
         for(int i = 0; i<surveySaved.getQuestionNumber(); i++){
             RequestQuestionDto questionDto = requestSurveyDto.getQuestion_list()[i];
             QuestionType type = questionTypeRepository.findById(questionDto.getType()).orElseThrow(() -> new IllegalArgumentException("해당 질문타입은 없습니다. id = " + questionDto.getType()));
             SurveyQuestion question = questionDto.toEntity(surveySaved, type);
-            //System.out.println(question.toString());
             SurveyQuestion questionSaved = surveyQuestionRepository.save(question);
+            //보기 생성
             for (int j = 0; j < questionSaved.getOptionNumber(); j++) {
-                QuestionOptionDto questionOptionDto = new QuestionOptionDto(null,questionDto.getOption_list()[j],j+1);
+                QuestionOptionDto questionOptionDto = questionDto.getOption_list()[j];
                 //System.out.println(questionOptionDto.toString());
                 QuestionOption questionOption = questionOptionDto.toEntity(questionSaved);
                 QuestionOption questionOptionSaved = questionOptionRepository.save(questionOption);

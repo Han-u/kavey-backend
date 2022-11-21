@@ -14,17 +14,18 @@ import scratch.BackEnd.domain.SurveyQuestion;
 public class RequestQuestionDto {
 
 	private String title;
-	private boolean is_required;
+	private boolean required;
+	private boolean foo;
 	private int ordering;
 	private long type;
 	private int option_number;
-	private String option_list[];
+	private QuestionOptionDto[] option_list;
 
 	public SurveyQuestion toEntity(Survey survey, QuestionType type ) {
 		return SurveyQuestion.builder()
 				.survey(survey)
 				.title(title)
-				.isRequried(is_required)
+				.isRequired(required)
 				.ordering(ordering)
 				.questionType(type)
 				.optionNumber(option_number)
