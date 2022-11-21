@@ -3,6 +3,7 @@ package scratch.BackEnd.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -22,8 +23,8 @@ public class SurveyAttend {
     private String sendEmail;
     @Enumerated(EnumType.STRING)
     private AttendStatus status;
-    private String responseDate; //설문 응답 시간
-    private String sendDate; //설문 보낸 시간
+    private LocalDateTime responseDate; //설문 응답 시간
+    private LocalDateTime sendDate; //설문 보낸 시간
     private String gender; //성별
     private String age; //나이
 }
