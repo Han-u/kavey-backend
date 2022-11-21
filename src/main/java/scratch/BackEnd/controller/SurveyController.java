@@ -33,7 +33,7 @@ public class SurveyController {
     }
 
     @PostMapping("/{surveyId}/submit")
-    public ResponseEntity submitSurvey(@RequestBody RequestSubmitSurveyDto requestSubmitSurveyDto, @PathVariable Long surveyId){
+    public ResponseEntity<?> submitSurvey(@RequestBody RequestSubmitSurveyDto requestSubmitSurveyDto, @PathVariable Long surveyId){
         String email = "asf@asdf.com"; // 인증 정보 오면 바뀔 부분
         surveyService.submitSurvey(requestSubmitSurveyDto, surveyId, email);
         return ResponseEntity.ok().build();
