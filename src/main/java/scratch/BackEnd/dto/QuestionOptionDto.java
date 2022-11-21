@@ -14,12 +14,14 @@ public class QuestionOptionDto implements Serializable {
 	private final Long optionId;
 	private final String value;
 	private final int ordering;
+	private final String data;
 
 	public QuestionOption toEntity(SurveyQuestion question){
 		return QuestionOption.builder()
 				.surveyQuestion(question)
 				.value(value)
 				.ordering(ordering)
+				.data(data)
 				.build();
 	}
 }

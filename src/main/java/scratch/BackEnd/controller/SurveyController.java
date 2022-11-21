@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import scratch.BackEnd.domain.Survey;
-import scratch.BackEnd.domain.SurveyAttend;
 import scratch.BackEnd.dto.RequestAddSurveyReceiverDto;
+import scratch.BackEnd.dto.RequestSubmitSurveyDto;
 import scratch.BackEnd.dto.RequestSurveyDto;
 import scratch.BackEnd.dto.SurveyReceiverDto;
 import scratch.BackEnd.service.SurveyService;
@@ -21,7 +21,6 @@ public class SurveyController {
 
     @PostMapping("")
     public String createSurvey(@RequestBody RequestSurveyDto requestSurveyDto){
-        //ObjectMapper objectMapper = new ObjectMapper();   //카멜 스네이크 바꾸는거 하기
         //System.out.println(requestSurveyDto.toString());
         surveyService.makeSurvey(requestSurveyDto);
         return "";
@@ -31,6 +30,13 @@ public class SurveyController {
     @GetMapping("")
     public List<Survey> getSurveyList(){
         return surveyService.readSurvey();
+    }
+
+    @PostMapping("/{surveyId}/submit")
+    public ResponseEntity submitSurvey(@RequestBody RequestSubmitSurveyDto requestSubmitSurveyDto, @PathVariable Long surveyId){
+        String email = "asf@asdf.com"; // 인증 정보 오면 바뀔 부분
+        surveyService.submitSurvey(requestSubmitSurveyDto, surveyId, email);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{surveyId}/receiver")

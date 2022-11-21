@@ -29,4 +29,10 @@ public class AnswerMulti {
     @ManyToOne
     @JoinColumn(name="option_id")
     private QuestionOption questionOption; //객관식 답변
+
+    public AnswerMulti(SurveyQuestion surveyQuestion, User user, QuestionOption questionOption){
+        this.surveyQuestion = surveyQuestion;
+        this.user = user;
+        this.questionOption = questionOption;
+    }
 }

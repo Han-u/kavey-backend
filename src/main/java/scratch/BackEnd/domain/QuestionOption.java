@@ -20,11 +20,13 @@ public class QuestionOption {
     private SurveyQuestion surveyQuestion;
     private String value; //보기
     private int ordering;
+    private String data;
 
     @Builder
-    public QuestionOption(SurveyQuestion question, String value, int ordering) {
+    public QuestionOption(SurveyQuestion question, String value, int ordering, String data) {
         this.surveyQuestion = question;
         this.value = value;
         this.ordering = ordering;
+        this.data = data;
     }
 }
