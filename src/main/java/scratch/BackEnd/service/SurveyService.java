@@ -2,14 +2,11 @@ package scratch.BackEnd.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import scratch.BackEnd.components.MailUtil;
 import scratch.BackEnd.domain.*;
-import org.springframework.transaction.annotation.Transactional;
-import scratch.BackEnd.domain.*;
-import scratch.BackEnd.dto.QuestionOptionDto;
-import scratch.BackEnd.dto.RequestQuestionDto;
-import scratch.BackEnd.dto.RequestSubmitSurveyDto;
-import scratch.BackEnd.dto.RequestSurveyDto;
+import scratch.BackEnd.dto.*;
 import scratch.BackEnd.repository.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +24,8 @@ public class SurveyService {
     private final SurveyAttendRepository surveyAttendRepository;
     private final AnswerSubRepository answerSubRepository;
     private final AnswerMultiRepository answerMultiRepository;
+
+    private final MailUtil mailUtil;
 
 
     public boolean makeSurvey(RequestSurveyDto requestSurveyDto){
@@ -160,4 +159,36 @@ public class SurveyService {
     private Boolean isBetweenDay(LocalDateTime targetDate, LocalDateTime from, LocalDateTime to){
         return (targetDate.isAfter(from) || targetDate.isEqual(from)) && (targetDate.isBefore(to) || targetDate.isEqual(to));
     }
+    public List<SurveyReceiverDto> getSurveyReceiver(Long surveyId) {
+        List<SurveyAttend> attends = surveyAttendRepository.findBySurvey_SurveyId(surveyId);
+        return attends.stream().map(SurveyReceiverDto::fromEntity).collect(Collectors.toList());
+    }
+
+    public void addSurveyReceiver(Long surveyId, RequestAddSurveyReceiverDto dto) {
+        // 해당 설문이 있는지 확인
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
+
+        // 이미 추가된 이메일인지 확인
+        Optional<SurveyAttend> attend = surveyAttendRepository.findBySurveyAndSendEmail(survey, dto.getEmail());
+        if (attend.isPresent()) {
+            throw new RuntimeException("이미 추가된 이메일 입니다.");
+        }
+
+        // 이메일 전송하는 부분 나중에 수정
+        String email = dto.getEmail();
+        String subject = "설문에 참여해주세요!";
+        String text = "<p>다음 설문에 응답해주세요!</p> <p>링크클릭</p>" +
+                "<div><a href='#'>설문 응답하러가기</a></div>";
+        mailUtil.sendMail(email, subject, text);
+
+
+        // 추가함
+        surveyAttendRepository.save(SurveyAttend.builder()
+                .sendDate(LocalDateTime.now())
+                .sendEmail(dto.getEmail())
+                .status(AttendStatus.NONRESPONSE)
+                .survey(survey)
+                .build());
+    }
+
 }
