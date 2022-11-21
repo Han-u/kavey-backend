@@ -5,8 +5,6 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Entity
@@ -28,22 +26,28 @@ public class SurveyQuestion {
     @JoinColumn(name="survey_id")
     private Survey survey;
 
-    @OneToMany(mappedBy= "surveyQuestion")
-    private List<QuestionType> questionTypes = new ArrayList<>();
+//    @OneToMany(mappedBy= "surveyQuestion")
+//    private List<QuestionType> questionTypes = new ArrayList<>();
+
+
+    @ManyToOne
+    @JoinColumn(name = "questionType_id")
+    private QuestionType questionType;
+
 
     private String title;
     private int ordering;
     private boolean isDeleted = Boolean.FALSE;
-    private boolean isRequried;
+    private boolean isRequired;
     private int optionNumber;
 
     @Builder
-    public SurveyQuestion(Survey survey, QuestionType questionType, String title, int ordering, boolean is_Requried, int optionNumber) {
+    public SurveyQuestion(Survey survey, QuestionType questionType, String title, int ordering, boolean is_required, int optionNumber) {
         this.survey = survey;
-//        this.questionTypes = questionType;
+        this.questionType = questionType;
         this.title = title;
         this.ordering = ordering;
-        this.isRequried = is_Requried;
+        this.isRequired = is_required;
         this.optionNumber = optionNumber;
 
     }

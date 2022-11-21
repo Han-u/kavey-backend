@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
+
 @Entity
 @Getter
 @Setter
@@ -15,9 +16,13 @@ public class QuestionType {
     @Id
     private Long questionTypeId;
 
-    @ManyToOne
-    @JoinColumn(name="question_id")
-    private SurveyQuestion surveyQuestion;
+//    @ManyToOne                            //머임?
+//    @JoinColumn(name="question_id")
+//    private SurveyQuestion surveyQuestion;
+
+//    @OneToMany(mappedBy = "questionType")
+//    private List<SurveyQuestion> surverQuestions = new ArrayList<>();
+
 
     @Column(nullable = false)
     private String typeName;
