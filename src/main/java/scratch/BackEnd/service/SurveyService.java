@@ -98,6 +98,7 @@ public class SurveyService {
             userAttendInfo.setAge(requestSubmitSurveyDto.getAge());
             userAttendInfo.setGender(requestSubmitSurveyDto.getGender());
             userAttendInfo.setStatus(AttendStatus.RESPONSE);
+            userAttendInfo.setResponseDate(LocalDateTime.now());
             surveyAttendRepository.save(userAttendInfo);
         }else{
             surveyAttendRepository.save(
@@ -107,6 +108,7 @@ public class SurveyService {
                             .sendEmail(userEmail)
                             .status(AttendStatus.RESPONSE)
                             .survey(survey)
+                            .responseDate(LocalDateTime.now())
                             .build()
             );
         }
