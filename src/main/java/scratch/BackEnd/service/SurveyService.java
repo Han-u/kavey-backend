@@ -72,7 +72,7 @@ public class SurveyService {
 
         // 2. 각 질문별 저장하기
         // 2-1. 주관식 저장하기
-        List<AnswerSub> answerSubList = requestSubmitSurveyDto.getSurveySubjectiveTemplates().stream()
+        List<AnswerSub> answerSubList = requestSubmitSurveyDto.getSurveySubjective().stream()
                         .map(e -> {
                             SurveyQuestion surveyQuestion = surveyQuestionRepository.findByQuestionIdAndSurvey(e.getQuestionId(), survey).orElseThrow(() -> new RuntimeException("BAD REQUEST"));
                             return new AnswerSub(surveyQuestion, user, e.getValue());
@@ -81,7 +81,7 @@ public class SurveyService {
         answerSubRepository.saveAll(answerSubList);
 
         // 2-2. 객관식 저장하기
-        List<AnswerMulti> answerMultiList = requestSubmitSurveyDto.getSurveyTemplates().stream()
+        List<AnswerMulti> answerMultiList = requestSubmitSurveyDto.getSurveyMultiple().stream()
                 .map(e -> {
                     SurveyQuestion surveyQuestion = surveyQuestionRepository.findByQuestionIdAndSurvey(e.getQuestionId(), survey).orElseThrow(() -> new RuntimeException("BAD REQUEST2"));
                     QuestionOption questionOption = questionOptionRepository.findByOptionIdAndSurveyQuestion(e.getOptionId(), surveyQuestion).orElseThrow(() -> new RuntimeException("BAD REQUEST3"));
@@ -151,7 +151,7 @@ public class SurveyService {
             // 2. 오픈형인 경우
             // 2-1. 참여 제한에 걸려있는지?
             int participants = surveyAttendRepository.countBySurveyAndStatus(survey, AttendStatus.RESPONSE);
-            if (survey.getLimitPerson() >= participants){
+            if (survey.getLimitPerson() <= participants){
                 throw new RuntimeException("선착순 끝~ 더빨리 움직이셈ㅋㅋ");
             }
         }
