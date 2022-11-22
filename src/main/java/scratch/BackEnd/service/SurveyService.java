@@ -60,6 +60,25 @@ public class SurveyService {
         return surveyList.stream().map(SurveyListDto::fromEntity).collect(Collectors.toList());
     }
 
+    public void deleteSurvey(Long surveyId){
+        // 설문지 조회
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
+
+        // 해당 유저에게 권한이 있는지 확인
+        // 카카오 인증 추가되면 수정함
+//        User user = survey.getUser();
+//        if (!Objects.equals(user.getEmail(), "asf@asdf.com")){
+//            throw new RuntimeException("권한이 없습니다.");
+//        }
+
+        // 설문하는 동안에는 삭제 못하도록함
+        if (survey.getStatus() == SurveyStatus.PROGRESS){
+            throw new RuntimeException("진행중인 설문은 삭제가 불가능합니다.");
+        }
+
+        surveyRepository.deleteById(surveyId);
+    }
+
     /**
      * 설문 참여자가 제출한 설문 응답을 저장한다.
      */

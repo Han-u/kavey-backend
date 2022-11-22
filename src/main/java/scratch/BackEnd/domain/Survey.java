@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Where(clause = "is_deleted = false")
-@SQLDelete(sql= "UPDATE survey SET is_deleted=true WHERE surveyId = ?")
+@SQLDelete(sql= "UPDATE survey SET is_deleted=true WHERE survey_id = ?")
 @ToString
 public class Survey {
 

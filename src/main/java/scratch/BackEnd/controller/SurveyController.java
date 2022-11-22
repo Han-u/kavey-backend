@@ -29,6 +29,12 @@ public class SurveyController {
         return surveyService.getSurveyList(email);
     }
 
+    @DeleteMapping("/{surveyId}")
+    public ResponseEntity<?> deleteSurvey(@PathVariable Long surveyId){
+        surveyService.deleteSurvey(surveyId);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/{surveyId}/submit")
     public ResponseEntity<?> submitSurvey(@RequestBody RequestSubmitSurveyDto requestSubmitSurveyDto, @PathVariable Long surveyId){
         String email = "asf@asdf.com"; // 인증 정보 오면 바뀔 부분
