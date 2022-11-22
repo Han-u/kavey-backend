@@ -7,6 +7,8 @@ import scratch.BackEnd.domain.*;
 import scratch.BackEnd.dto.*;
 import scratch.BackEnd.repository.*;
 import org.springframework.transaction.annotation.Transactional;
+import scratch.BackEnd.type.AttendStatus;
+import scratch.BackEnd.type.SurveyStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,7 +21,6 @@ public class SurveyService {
     private final SurveyRepository surveyRepository;
     private final SurveyQuestionRepository surveyQuestionRepository;
     private final QuestionOptionRepository questionOptionRepository;
-    private final QuestionTypeRepository questionTypeRepository;
     private final UserRepository userRepository;
     private final SurveyAttendRepository surveyAttendRepository;
     private final AnswerSubRepository answerSubRepository;
@@ -30,27 +31,23 @@ public class SurveyService {
 
     public boolean makeSurvey(RequestSurveyDto requestSurveyDto){
         //설문 생성
-        User user = userRepository.findById(requestSurveyDto.getUser_id()).orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다. id = " + requestSurveyDto.getUser_id()));
+        User user = userRepository.findById(requestSurveyDto.getUserId()).orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다. id = " + requestSurveyDto.getUserId()));
         Survey survey = requestSurveyDto.toEntity(user, SurveyStatus.MAKING);
         Survey surveySaved = surveyRepository.save(survey);
-        //System.out.println(surveySaved.toString());
 
         //질문 생성
         for(int i = 0; i<surveySaved.getQuestionNumber(); i++){
-            RequestQuestionDto questionDto = requestSurveyDto.getQuestion_list()[i];
-            QuestionType type = questionTypeRepository.findById(questionDto.getType()).orElseThrow(() -> new IllegalArgumentException("해당 질문타입은 없습니다. id = " + questionDto.getType()));
-            SurveyQuestion question = questionDto.toEntity(surveySaved, type);
+            RequestQuestionDto questionDto = requestSurveyDto.getQuestionList()[i];
+            SurveyQuestion question = questionDto.toEntity(surveySaved);
             SurveyQuestion questionSaved = surveyQuestionRepository.save(question);
             //보기 생성
             for (int j = 0; j < questionSaved.getOptionNumber(); j++) {
-                QuestionOptionDto questionOptionDto = questionDto.getOption_list()[j];
-                //System.out.println(questionOptionDto.toString());
+                QuestionOptionDto questionOptionDto = questionDto.getOptionList()[j];
                 QuestionOption questionOption = questionOptionDto.toEntity(questionSaved);
                 QuestionOption questionOptionSaved = questionOptionRepository.save(questionOption);
             }
 
         }
-
 
         return true;
     }

@@ -3,6 +3,7 @@ package scratch.BackEnd.domain;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import scratch.BackEnd.type.QuestionType;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -27,13 +28,7 @@ public class SurveyQuestion extends BaseTimeEntity{
     @ManyToOne
     @JoinColumn(name="survey_id")
     private Survey survey;
-
-//    @OneToMany(mappedBy= "surveyQuestion")
-//    private List<QuestionType> questionTypes = new ArrayList<>();
-
-
-    @ManyToOne
-    @JoinColumn(name = "questionType_id")
+    @Enumerated(EnumType.STRING)
     private QuestionType questionType;
 
 

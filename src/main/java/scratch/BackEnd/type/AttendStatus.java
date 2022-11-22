@@ -1,4 +1,4 @@
-package scratch.BackEnd.domain;
+package scratch.BackEnd.type;
 
 public enum AttendStatus {
     //응답, 무응답, 거절
