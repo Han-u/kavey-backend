@@ -54,8 +54,10 @@ public class SurveyService {
 
         return true;
     }
-    public List<Survey> readSurvey(){
-        return surveyRepository.findAll();
+    public List<SurveyListDto> getSurveyList(String email){
+        User user = userRepository.findByEmail(email);
+        List<Survey> surveyList =  surveyRepository.findByUser(user);
+        return surveyList.stream().map(SurveyListDto::fromEntity).collect(Collectors.toList());
     }
 
     /**
