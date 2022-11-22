@@ -2,7 +2,7 @@ package scratch.BackEnd.dto;
 
 import lombok.*;
 import scratch.BackEnd.domain.Survey;
-import scratch.BackEnd.domain.SurveyStatus;
+import scratch.BackEnd.type.SurveyStatus;
 import scratch.BackEnd.domain.User;
 
 import java.time.LocalDateTime;

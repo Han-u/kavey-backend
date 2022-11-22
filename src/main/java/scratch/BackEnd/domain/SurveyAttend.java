@@ -1,6 +1,7 @@
 package scratch.BackEnd.domain;
 
 import lombok.*;
+import scratch.BackEnd.type.AttendStatus;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

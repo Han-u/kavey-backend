@@ -1,4 +1,4 @@
-package scratch.BackEnd.domain;
+package scratch.BackEnd.type;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

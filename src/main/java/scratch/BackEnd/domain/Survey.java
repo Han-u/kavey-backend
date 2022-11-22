@@ -3,6 +3,7 @@ package scratch.BackEnd.domain;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import scratch.BackEnd.type.SurveyStatus;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

@@ -18,7 +18,7 @@ import java.util.List;
 @Where(clause = "is_deleted = false")
 @SQLDelete(sql= "UPDATE question SET is_deleted=true WHERE question_id = ?")
 @ToString
-public class SurveyQuestion {
+public class SurveyQuestion extends BaseTimeEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
