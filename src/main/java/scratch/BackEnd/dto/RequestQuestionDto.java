@@ -15,11 +15,10 @@ public class RequestQuestionDto {
 
 	private String title;
 	private boolean required;
-	private boolean foo;
 	private int ordering;
-	private long type;
-	private int option_number;
-	private QuestionOptionDto[] option_list;
+	private QuestionType type;
+	private int optionNumber;
+	private QuestionOptionDto[] optionList;
 
 	public SurveyQuestion toEntity(Survey survey, QuestionType type ) {
 		return SurveyQuestion.builder()
@@ -28,7 +27,7 @@ public class RequestQuestionDto {
 				.isRequired(required)
 				.ordering(ordering)
 				.questionType(type)
-				.optionNumber(option_number)
+				.optionNumber(optionNumber)
 				.build();
 	}
 

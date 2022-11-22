@@ -44,12 +44,12 @@ public class SurveyQuestion {
     private int optionNumber;
 
     @Builder
-    public SurveyQuestion(Survey survey, QuestionType questionType, String title, int ordering, boolean is_required, int optionNumber) {
+    public SurveyQuestion(Survey survey, QuestionType questionType, String title, int ordering, boolean isRequired, int optionNumber) {
         this.survey = survey;
         this.questionType = questionType;
         this.title = title;
         this.ordering = ordering;
-        this.isRequired = is_required;
+        this.isRequired = isRequired;
         this.optionNumber = optionNumber;
 
     }
