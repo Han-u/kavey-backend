@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import scratch.BackEnd.domain.Survey;
 import scratch.BackEnd.dto.RequestSurveyDto;
+import scratch.BackEnd.dto.ResponseSurveyDto;
 import scratch.BackEnd.service.SurveyService;
 
 import java.util.List;
@@ -20,11 +21,16 @@ public class SurveyController {
         surveyService.makeSurvey(requestSurveyDto);
         return "";
     }
-
-
     @GetMapping("")
     public List<Survey> getSurveyList(){
         return surveyService.readSurvey();
+    }
+
+    @GetMapping("/{surveyId}/page")
+    public ResponseSurveyDto getSurvey(@PathVariable Long surveyId){
+        ResponseSurveyDto responseSurveyDto = surveyService.getSurvey(surveyId);
+        System.out.println(responseSurveyDto);
+        return responseSurveyDto;
     }
 
 }
