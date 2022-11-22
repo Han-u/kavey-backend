@@ -1,7 +1,8 @@
-package scratch.BackEnd.domain;
+package scratch.BackEnd.dto.kakaoLoginDto;
 
 import lombok.Data;
 
+// 카카오로 부터 받은 사용자 정보를 담을 객체
 @Data
 public class KakaoProfile {
 

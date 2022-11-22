@@ -14,7 +14,7 @@ import scratch.BackEnd.service.SurveyService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/survey")
+@RequestMapping("/api/survey")
 @AllArgsConstructor
 public class SurveyController {
     private final SurveyService surveyService;

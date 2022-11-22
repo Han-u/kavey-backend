@@ -12,9 +12,9 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Where(clause = "is_deleted = false")
 @SQLDelete(sql= "UPDATE survey SET is_deleted=true WHERE surveyId = ?")
 @ToString

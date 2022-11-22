@@ -5,14 +5,16 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Where(clause = "is_deleted = false")
 @SQLDelete(sql= "UPDATE question SET is_deleted=true WHERE questionId = ?")
 @ToString
