@@ -22,7 +22,6 @@ public class SurveyController {
         return "";
     }
 
-
     @GetMapping("")
     public List<SurveyListDto> getSurveyList(){
         String email = "asf@asdf.com"; // 인증 추가되면 바뀔 부분
@@ -32,6 +31,12 @@ public class SurveyController {
     @DeleteMapping("/{surveyId}")
     public ResponseEntity<?> deleteSurvey(@PathVariable Long surveyId){
         surveyService.deleteSurvey(surveyId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{surveyId}/early-closing")
+    public ResponseEntity<?> closeSurvey(@PathVariable Long surveyId){
+        surveyService.closeSurvey(surveyId);
         return ResponseEntity.ok().build();
     }
 
