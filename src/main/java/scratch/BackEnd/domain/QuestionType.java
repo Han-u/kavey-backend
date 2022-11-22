@@ -5,6 +5,11 @@ import lombok.*;
 import javax.persistence.*;
 
 
+//public enum QuestionType {
+//
+//}
+
+
 @Entity
 @Getter
 @Setter
@@ -28,3 +33,5 @@ public class QuestionType {
     private String typeName;
 
 }
+
+

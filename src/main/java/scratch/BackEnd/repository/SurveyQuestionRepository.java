@@ -7,8 +7,12 @@ import scratch.BackEnd.domain.SurveyQuestion;
 
 import java.util.Optional;
 
+import java.util.List;
+
 
 public interface SurveyQuestionRepository extends JpaRepository<SurveyQuestion, Long> {
     Optional<SurveyQuestion> findByQuestionIdAndSurvey(Long questionId, Survey survey);
+
+	List<SurveyQuestion> findBySurvey(Survey survey);
 
 }
