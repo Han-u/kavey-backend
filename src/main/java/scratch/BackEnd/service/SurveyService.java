@@ -54,8 +54,50 @@ public class SurveyService {
 
         return true;
     }
-    public List<Survey> readSurvey(){
-        return surveyRepository.findAll();
+    public List<SurveyListDto> getSurveyList(String email){
+        User user = userRepository.findByEmail(email);
+        List<Survey> surveyList =  surveyRepository.findByUser(user);
+        return surveyList.stream().map(SurveyListDto::fromEntity).collect(Collectors.toList());
+    }
+
+    public void deleteSurvey(Long surveyId){
+        // 설문지 조회
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
+
+        // 해당 유저에게 권한이 있는지 확인
+        // 카카오 인증 추가되면 수정함
+//        User user = survey.getUser();
+//        if (!Objects.equals(user.getEmail(), "asf@asdf.com")){
+//            throw new RuntimeException("권한이 없습니다.");
+//        }
+
+        // 설문하는 동안에는 삭제 못하도록함
+        if (survey.getStatus() == SurveyStatus.PROGRESS){
+            throw new RuntimeException("진행중인 설문은 삭제가 불가능합니다.");
+        }
+
+        surveyRepository.deleteById(surveyId);
+    }
+
+    public void closeSurvey(Long surveyId){
+        // 설문지 조회
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
+
+        // 해당 유저에게 권한이 있는지 확인
+
+        // 설문 진행중인 설문만 조기종료 가능
+        if (survey.getStatus() != SurveyStatus.PROGRESS){
+            throw new RuntimeException("진행중인 설문만 조기종료가 가능합니다.");
+        }
+
+        // 이미 조기 종료된 설문도 조기종료 불가능
+        if (survey.getEarlyEndDate() != null){
+            throw new RuntimeException("이미 종료된 설문입니다.");
+        }
+
+        survey.setEarlyEndDate(LocalDateTime.now());
+        survey.setStatus(SurveyStatus.DONE);
+        surveyRepository.save(survey);
     }
 
     /**

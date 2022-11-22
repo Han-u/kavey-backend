@@ -4,11 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import scratch.BackEnd.domain.Survey;
-import scratch.BackEnd.dto.RequestAddSurveyReceiverDto;
-import scratch.BackEnd.dto.RequestSubmitSurveyDto;
-import scratch.BackEnd.dto.RequestSurveyDto;
-import scratch.BackEnd.dto.SurveyReceiverDto;
+import scratch.BackEnd.dto.*;
 import scratch.BackEnd.service.SurveyService;
 
 import java.util.List;
@@ -26,10 +22,22 @@ public class SurveyController {
         return "";
     }
 
-
     @GetMapping("")
-    public List<Survey> getSurveyList(){
-        return surveyService.readSurvey();
+    public List<SurveyListDto> getSurveyList(){
+        String email = "asf@asdf.com"; // 인증 추가되면 바뀔 부분
+        return surveyService.getSurveyList(email);
+    }
+
+    @DeleteMapping("/{surveyId}")
+    public ResponseEntity<?> deleteSurvey(@PathVariable Long surveyId){
+        surveyService.deleteSurvey(surveyId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{surveyId}/early-closing")
+    public ResponseEntity<?> closeSurvey(@PathVariable Long surveyId){
+        surveyService.closeSurvey(surveyId);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{surveyId}/submit")
