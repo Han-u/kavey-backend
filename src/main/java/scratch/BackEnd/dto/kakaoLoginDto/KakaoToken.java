@@ -1,9 +1,10 @@
-package scratch.BackEnd.domain;
+package scratch.BackEnd.dto.kakaoLoginDto;
 
 import lombok.Data;
 
+// 인가코드를 가지고 카카오로 부터 받은 토큰을 담을 객체
 @Data
-public class OauthToken {
+public class KakaoToken {
     private String access_token;
     private String token_type;
     private String refresh_token;
