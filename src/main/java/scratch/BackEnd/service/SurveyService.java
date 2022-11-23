@@ -105,22 +105,22 @@ public class SurveyService {
     public void submitSurvey(RequestSubmitSurveyDto requestSubmitSurveyDto, Long surveyId, String email) {
         // 1. 해당 설문지 찾기
         Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
-        SurveyAttend surveyAttend;
+        Attend attend;
         isValidSurvey(survey);
 
         if (survey.isPrivate()){
             // 1. 폐쇄형인 경우
             // 1-1. 해당 설문에 대한 참여 권한이 있는지
-            surveyAttend = surveyAttendRepository.findBySurveyAndSendEmail(survey, email)
+            attend = surveyAttendRepository.findBySurveyAndSendEmail(survey, email)
                     .orElseThrow(() -> new RuntimeException("참여 권한이 없습니다."));
-            if (surveyAttend.getStatus() != AttendStatus.NONRESPONSE){
+            if (attend.getStatus() != AttendStatus.NONRESPONSE){
                 throw new RuntimeException("응답할 수 없는 설문입니다.");
             }
-            surveyAttend.setAge(requestSubmitSurveyDto.getAge());
-            surveyAttend.setGender(requestSubmitSurveyDto.getGender());
-            surveyAttend.setStatus(AttendStatus.RESPONSE);
-            surveyAttend.setResponseDate(LocalDateTime.now());
-            surveyAttendRepository.save(surveyAttend);
+            attend.setAge(requestSubmitSurveyDto.getAge());
+            attend.setGender(requestSubmitSurveyDto.getGender());
+            attend.setStatus(AttendStatus.RESPONSE);
+            attend.setResponseDate(LocalDateTime.now());
+            surveyAttendRepository.save(attend);
 
         }
         else{
@@ -130,17 +130,17 @@ public class SurveyService {
             if (survey.getLimitPerson() <= participants){
                 throw new RuntimeException("선착순 끝~ 더빨리 움직이셈ㅋㅋ");
             }
-            Optional<SurveyAttend> optionalSurveyAttend = surveyAttendRepository.findBySurveyAndSendEmail(survey, email);
+            Optional<Attend> optionalSurveyAttend = surveyAttendRepository.findBySurveyAndSendEmail(survey, email);
             if(optionalSurveyAttend.isPresent()){
-                surveyAttend = optionalSurveyAttend.get();
-                surveyAttend.setAge(requestSubmitSurveyDto.getAge());
-                surveyAttend.setGender(requestSubmitSurveyDto.getGender());
-                surveyAttend.setStatus(AttendStatus.RESPONSE);
-                surveyAttend.setResponseDate(LocalDateTime.now());
-                surveyAttendRepository.save(surveyAttend);
+                attend = optionalSurveyAttend.get();
+                attend.setAge(requestSubmitSurveyDto.getAge());
+                attend.setGender(requestSubmitSurveyDto.getGender());
+                attend.setStatus(AttendStatus.RESPONSE);
+                attend.setResponseDate(LocalDateTime.now());
+                surveyAttendRepository.save(attend);
             }else{
-                surveyAttend = surveyAttendRepository.save(
-                        SurveyAttend.builder()
+                attend = surveyAttendRepository.save(
+                        Attend.builder()
                                 .age(requestSubmitSurveyDto.getAge())
                                 .gender(requestSubmitSurveyDto.getGender())
                                 .sendEmail(email)
@@ -159,7 +159,7 @@ public class SurveyService {
         List<AnswerSub> answerSubList = requestSubmitSurveyDto.getSurveySubjective().stream()
                         .map(e -> {
                             SurveyQuestion surveyQuestion = surveyQuestionRepository.findByQuestionIdAndSurvey(e.getQuestionId(), survey).orElseThrow(() -> new RuntimeException("BAD REQUEST"));
-                            return new AnswerSub(surveyQuestion, surveyAttend, e.getValue());
+                            return new AnswerSub(surveyQuestion, attend, e.getValue());
                         })
                         .collect(Collectors.toList());
         answerSubRepository.saveAll(answerSubList);
@@ -169,7 +169,7 @@ public class SurveyService {
                 .map(e -> {
                     SurveyQuestion surveyQuestion = surveyQuestionRepository.findByQuestionIdAndSurvey(e.getQuestionId(), survey).orElseThrow(() -> new RuntimeException("BAD REQUEST2"));
                     QuestionOption questionOption = questionOptionRepository.findByOptionIdAndSurveyQuestion(e.getOptionId(), surveyQuestion).orElseThrow(() -> new RuntimeException("BAD REQUEST3"));
-                    return new AnswerMulti(surveyQuestion, surveyAttend, questionOption);
+                    return new AnswerMulti(surveyQuestion, attend, questionOption);
                 })
                 .collect(Collectors.toList());
         answerMultiRepository.saveAll(answerMultiList);
@@ -198,7 +198,7 @@ public class SurveyService {
         return (targetDate.isAfter(from) || targetDate.isEqual(from)) && (targetDate.isBefore(to) || targetDate.isEqual(to));
     }
     public List<SurveyReceiverDto> getSurveyReceiver(Long surveyId) {
-        List<SurveyAttend> attends = surveyAttendRepository.findBySurvey_SurveyId(surveyId);
+        List<Attend> attends = surveyAttendRepository.findBySurvey_SurveyId(surveyId);
         return attends.stream().map(SurveyReceiverDto::fromEntity).collect(Collectors.toList());
     }
 
@@ -207,7 +207,7 @@ public class SurveyService {
         Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
 
         // 이미 추가된 이메일인지 확인
-        Optional<SurveyAttend> attend = surveyAttendRepository.findBySurveyAndSendEmail(survey, dto.getEmail());
+        Optional<Attend> attend = surveyAttendRepository.findBySurveyAndSendEmail(survey, dto.getEmail());
         if (attend.isPresent()) {
             throw new RuntimeException("이미 추가된 이메일 입니다.");
         }
@@ -221,7 +221,7 @@ public class SurveyService {
 
 
         // 추가함
-        surveyAttendRepository.save(SurveyAttend.builder()
+        surveyAttendRepository.save(Attend.builder()
                 .sendDate(LocalDateTime.now())
                 .sendEmail(dto.getEmail())
                 .status(AttendStatus.NONRESPONSE)

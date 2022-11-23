@@ -16,7 +16,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update  # option type: create, create-drop, update, validate, none
+      ddl-auto: create  # option type: create, create-drop, update, validate, none
     properties:
       hibernate:
         show_sql: true  # sql 쿼리 보여줌

@@ -2,7 +2,7 @@ package scratch.BackEnd.dto;
 
 import lombok.*;
 import scratch.BackEnd.type.AttendStatus;
-import scratch.BackEnd.domain.SurveyAttend;
+import scratch.BackEnd.domain.Attend;
 
 import java.time.LocalDateTime;
 
@@ -17,7 +17,7 @@ public class SurveyReceiverDto {
     private LocalDateTime responseDate;
     private LocalDateTime sendDate;
 
-    public static SurveyReceiverDto fromEntity(SurveyAttend attend){
+    public static SurveyReceiverDto fromEntity(Attend attend){
         return SurveyReceiverDto.builder()
                 .attendID(attend.getAttendId())
                 .sendEmail(attend.getSendEmail())

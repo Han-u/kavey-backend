@@ -26,7 +26,7 @@ public class AnswerMulti {
 
     @ManyToOne
     @JoinColumn(name="attend_id")
-    private SurveyAttend surveyAttend;
+    private Attend attend;
 
 //    private Long surveyId;
 
@@ -34,9 +34,9 @@ public class AnswerMulti {
     @JoinColumn(name="option_id")
     private QuestionOption questionOption; //객관식 답변
 
-    public AnswerMulti(SurveyQuestion surveyQuestion, SurveyAttend surveyAttend, QuestionOption questionOption){
+    public AnswerMulti(SurveyQuestion surveyQuestion, Attend attend, QuestionOption questionOption){
         this.surveyQuestion = surveyQuestion;
-        this.surveyAttend = surveyAttend;
+        this.attend = attend;
         this.questionOption = questionOption;
     }
 }
