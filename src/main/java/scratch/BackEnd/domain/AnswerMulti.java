@@ -20,9 +20,13 @@ public class AnswerMulti {
     @JoinColumn(name="question_id")
     private SurveyQuestion surveyQuestion;
 
+//    @ManyToOne
+//    @JoinColumn(name="user_id")
+//    private User user;
+
     @ManyToOne
-    @JoinColumn(name="user_id")
-    private User user;
+    @JoinColumn(name="attend_id")
+    private SurveyAttend surveyAttend;
 
 //    private Long surveyId;
 
@@ -30,9 +34,9 @@ public class AnswerMulti {
     @JoinColumn(name="option_id")
     private QuestionOption questionOption; //객관식 답변
 
-    public AnswerMulti(SurveyQuestion surveyQuestion, User user, QuestionOption questionOption){
+    public AnswerMulti(SurveyQuestion surveyQuestion, SurveyAttend surveyAttend, QuestionOption questionOption){
         this.surveyQuestion = surveyQuestion;
-        this.user = user;
+        this.surveyAttend = surveyAttend;
         this.questionOption = questionOption;
     }
 }

@@ -102,55 +102,77 @@ public class SurveyService {
      * 설문 참여자가 제출한 설문 응답을 저장한다.
      */
     @Transactional
-    public void submitSurvey(RequestSubmitSurveyDto requestSubmitSurveyDto, Long surveyId, String userEmail) {
+    public void submitSurvey(RequestSubmitSurveyDto requestSubmitSurveyDto, Long surveyId, String email) {
         // 1. 해당 설문지 찾기
         Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
-        User user = userRepository.findByEmail(userEmail);
+        SurveyAttend surveyAttend;
         isValidSurvey(survey);
-        hasPermission(survey, userEmail);
 
-        // 2. 각 질문별 저장하기
-        // 2-1. 주관식 저장하기
+        if (survey.isPrivate()){
+            // 1. 폐쇄형인 경우
+            // 1-1. 해당 설문에 대한 참여 권한이 있는지
+            surveyAttend = surveyAttendRepository.findBySurveyAndSendEmail(survey, email)
+                    .orElseThrow(() -> new RuntimeException("참여 권한이 없습니다."));
+            if (surveyAttend.getStatus() != AttendStatus.NONRESPONSE){
+                throw new RuntimeException("응답할 수 없는 설문입니다.");
+            }
+            surveyAttend.setAge(requestSubmitSurveyDto.getAge());
+            surveyAttend.setGender(requestSubmitSurveyDto.getGender());
+            surveyAttend.setStatus(AttendStatus.RESPONSE);
+            surveyAttend.setResponseDate(LocalDateTime.now());
+            surveyAttendRepository.save(surveyAttend);
+
+        }
+        else{
+            // 2. 오픈형인 경우
+            // 2-1. 참여 제한에 걸려있는지?
+            int participants = surveyAttendRepository.countBySurveyAndStatus(survey, AttendStatus.RESPONSE);
+            if (survey.getLimitPerson() <= participants){
+                throw new RuntimeException("선착순 끝~ 더빨리 움직이셈ㅋㅋ");
+            }
+            Optional<SurveyAttend> optionalSurveyAttend = surveyAttendRepository.findBySurveyAndSendEmail(survey, email);
+            if(optionalSurveyAttend.isPresent()){
+                surveyAttend = optionalSurveyAttend.get();
+                surveyAttend.setAge(requestSubmitSurveyDto.getAge());
+                surveyAttend.setGender(requestSubmitSurveyDto.getGender());
+                surveyAttend.setStatus(AttendStatus.RESPONSE);
+                surveyAttend.setResponseDate(LocalDateTime.now());
+                surveyAttendRepository.save(surveyAttend);
+            }else{
+                surveyAttend = surveyAttendRepository.save(
+                        SurveyAttend.builder()
+                                .age(requestSubmitSurveyDto.getAge())
+                                .gender(requestSubmitSurveyDto.getGender())
+                                .sendEmail(email)
+                                .status(AttendStatus.RESPONSE)
+                                .survey(survey)
+                                .responseDate(LocalDateTime.now())
+                                .build()
+                );
+            }
+
+        }
+
+
+        // 3. 각 질문별 저장하기
+        // 3-1. 주관식 저장하기
         List<AnswerSub> answerSubList = requestSubmitSurveyDto.getSurveySubjective().stream()
                         .map(e -> {
                             SurveyQuestion surveyQuestion = surveyQuestionRepository.findByQuestionIdAndSurvey(e.getQuestionId(), survey).orElseThrow(() -> new RuntimeException("BAD REQUEST"));
-                            return new AnswerSub(surveyQuestion, user, e.getValue());
+                            return new AnswerSub(surveyQuestion, surveyAttend, e.getValue());
                         })
                         .collect(Collectors.toList());
         answerSubRepository.saveAll(answerSubList);
 
-        // 2-2. 객관식 저장하기
+        // 3-2. 객관식 저장하기
         List<AnswerMulti> answerMultiList = requestSubmitSurveyDto.getSurveyMultiple().stream()
                 .map(e -> {
                     SurveyQuestion surveyQuestion = surveyQuestionRepository.findByQuestionIdAndSurvey(e.getQuestionId(), survey).orElseThrow(() -> new RuntimeException("BAD REQUEST2"));
                     QuestionOption questionOption = questionOptionRepository.findByOptionIdAndSurveyQuestion(e.getOptionId(), surveyQuestion).orElseThrow(() -> new RuntimeException("BAD REQUEST3"));
-                    return new AnswerMulti(surveyQuestion, user, questionOption);
+                    return new AnswerMulti(surveyQuestion, surveyAttend, questionOption);
                 })
                 .collect(Collectors.toList());
         answerMultiRepository.saveAll(answerMultiList);
-
-        // 3. attend 테이블 업데이트하기
-        Optional<SurveyAttend> surveyAttend = surveyAttendRepository.findBySurveyAndSendEmail(survey, userEmail);
-
-        if(surveyAttend.isPresent()) {
-            SurveyAttend userAttendInfo = surveyAttend.get();
-            userAttendInfo.setAge(requestSubmitSurveyDto.getAge());
-            userAttendInfo.setGender(requestSubmitSurveyDto.getGender());
-            userAttendInfo.setStatus(AttendStatus.RESPONSE);
-            userAttendInfo.setResponseDate(LocalDateTime.now());
-            surveyAttendRepository.save(userAttendInfo);
-        }else{
-            surveyAttendRepository.save(
-                    SurveyAttend.builder()
-                            .age(requestSubmitSurveyDto.getAge())
-                            .gender(requestSubmitSurveyDto.getGender())
-                            .sendEmail(userEmail)
-                            .status(AttendStatus.RESPONSE)
-                            .survey(survey)
-                            .responseDate(LocalDateTime.now())
-                            .build()
-            );
-        }
 
     }
 
@@ -170,30 +192,6 @@ public class SurveyService {
             throw new RuntimeException("응답 가능한 설문이 아닙니다.");
         }
 
-    }
-    void hasPermission(Survey survey, String email){
-        Optional<SurveyAttend> surveyAttend = surveyAttendRepository.findBySurveyAndSendEmail(survey, email);
-
-        if (survey.isPrivate()){
-            // 1. 폐쇄형인 경우
-            // 1-1. 해당 설문에 대한 참여 권한이 있는지
-            if (surveyAttend.isPresent()){
-                if (surveyAttend.get().getStatus() != AttendStatus.NONRESPONSE){
-                    throw new RuntimeException("응답할 수 없는 설문입니다.");
-                }
-            }else{
-                throw new RuntimeException("참여권한이 없습니다.");
-            }
-
-        }
-        else{
-            // 2. 오픈형인 경우
-            // 2-1. 참여 제한에 걸려있는지?
-            int participants = surveyAttendRepository.countBySurveyAndStatus(survey, AttendStatus.RESPONSE);
-            if (survey.getLimitPerson() <= participants){
-                throw new RuntimeException("선착순 끝~ 더빨리 움직이셈ㅋㅋ");
-            }
-        }
     }
 
     private Boolean isBetweenDay(LocalDateTime targetDate, LocalDateTime from, LocalDateTime to){
