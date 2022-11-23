@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import scratch.BackEnd.type.AttendStatus;
 import scratch.BackEnd.type.SurveyStatus;
 
+import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -228,6 +229,32 @@ public class SurveyService {
                 .status(AttendStatus.NONRESPONSE)
                 .survey(survey)
                 .build());
+
+
+    public ResponseSurveyDto getSurvey(Long surveyId){
+        System.out.println("설문 찾기 id : " + surveyId);
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new IllegalArgumentException("해당 설문은 없습니다. id = " + surveyId));
+
+
+        List<SurveyQuestion> surveyQuestions = surveyQuestionRepository.findBySurvey(survey);       //설문 찾기
+
+        List<ResponseQuestionDto> responseQuestionDtos = new ArrayList<>();                         //설문에 포함된 질문 리스트로 만들기
+        for (SurveyQuestion surveyQuestion : surveyQuestions) {
+            List <QuestionOption> questionQuestions = questionOptionRepository.findBySurveyQuestion(surveyQuestion);
+
+            List <ResponseQuestionOptionDto> responseQuestionOptionDtos = new ArrayList<>();        //질문 보기 리스트로 만들기
+            for (QuestionOption questionOption : questionQuestions) {
+                responseQuestionOptionDtos.add(new ResponseQuestionOptionDto(questionOption));
+            }
+            responseQuestionDtos.add(new ResponseQuestionDto(surveyQuestion, responseQuestionOptionDtos));
+        }
+        ResponseSurveyDto responseSurveyDto = new ResponseSurveyDto(survey, responseQuestionDtos);
+
+        return responseSurveyDto;
+    }
+
+    public List<Survey> readSurvey(){
+        return surveyRepository.findAll();
     }
 
 }

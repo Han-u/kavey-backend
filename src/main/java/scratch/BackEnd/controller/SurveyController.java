@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import scratch.BackEnd.dto.*;
+import scratch.BackEnd.domain.Survey;
+import scratch.BackEnd.dto.RequestSurveyDto;
 import scratch.BackEnd.service.SurveyService;
 
 import java.util.List;
@@ -22,6 +24,13 @@ public class SurveyController {
         return "";
     }
 
+    @GetMapping("/{surveyId}/page")
+    public ResponseSurveyDto getSurvey(@PathVariable Long surveyId){
+        ResponseSurveyDto responseSurveyDto = surveyService.getSurvey(surveyId);
+        System.out.println(responseSurveyDto);
+        return responseSurveyDto;
+    }
+
     @GetMapping("")
     public List<SurveyListDto> getSurveyList(){
         String email = "asf@asdf.com"; // 인증 추가되면 바뀔 부분
@@ -33,6 +42,8 @@ public class SurveyController {
         surveyService.deleteSurvey(surveyId);
         return ResponseEntity.ok().build();
     }
+
+
 
     @PostMapping("/{surveyId}/early-closing")
     public ResponseEntity<?> closeSurvey(@PathVariable Long surveyId){
