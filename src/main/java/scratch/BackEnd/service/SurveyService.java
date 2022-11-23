@@ -229,6 +229,7 @@ public class SurveyService {
                 .status(AttendStatus.NONRESPONSE)
                 .survey(survey)
                 .build());
+    }
 
 
     public ResponseSurveyDto getSurvey(Long surveyId){
