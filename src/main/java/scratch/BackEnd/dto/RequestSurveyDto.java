@@ -4,6 +4,7 @@ import lombok.*;
 import scratch.BackEnd.domain.Survey;
 import scratch.BackEnd.type.SurveyStatus;
 import scratch.BackEnd.domain.User;
+import scratch.BackEnd.type.SurveyTheme;
 
 import java.time.LocalDateTime;
 
@@ -23,7 +24,7 @@ public class RequestSurveyDto {
 	private int limitPerson;
 	private LocalDateTime startDate;
 	private LocalDateTime endDate;
-	private int theme;
+	private SurveyTheme theme;
 	private int questionNumber;
 
 	private RequestQuestionDto[] questionList;
@@ -41,7 +42,7 @@ public class RequestSurveyDto {
 				.surveyStartDate(startDate)
 				.surveyEndDate(endDate)
 				.questionNumber(questionNumber)
-				.themeType(theme)
+				.theme(theme)
 				.build();
 	}
 
