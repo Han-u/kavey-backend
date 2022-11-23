@@ -1,6 +1,7 @@
 package scratch.BackEnd.domain;
 
 import lombok.*;
+import scratch.BackEnd.type.AttendStatus;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SurveyAttend {
+public class SurveyAttend extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long attendId;

@@ -17,7 +17,7 @@ public class AnswerMulti {
     private Long multiId;
 
     @OneToOne
-    @JoinColumn(name="qestion_id")
+    @JoinColumn(name="question_id")
     private SurveyQuestion surveyQuestion;
 
     @ManyToOne

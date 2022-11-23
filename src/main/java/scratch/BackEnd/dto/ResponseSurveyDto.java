@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import scratch.BackEnd.domain.Survey;
-import scratch.BackEnd.domain.SurveyStatus;
+import scratch.BackEnd.type.SurveyStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;

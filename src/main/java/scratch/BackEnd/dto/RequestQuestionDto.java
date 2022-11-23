@@ -1,9 +1,9 @@
 package scratch.BackEnd.dto;
 
 import lombok.*;
-import scratch.BackEnd.domain.QuestionType;
 import scratch.BackEnd.domain.Survey;
 import scratch.BackEnd.domain.SurveyQuestion;
+import scratch.BackEnd.type.QuestionType;
 
 
 @AllArgsConstructor
@@ -15,20 +15,19 @@ public class RequestQuestionDto {
 
 	private String title;
 	private boolean required;
-	private boolean foo;
 	private int ordering;
-	private long type;
-	private int option_number;
-	private QuestionOptionDto[] option_list;
+	private QuestionType type;
+	private int optionNumber;
+	private QuestionOptionDto[] optionList;
 
-	public SurveyQuestion toEntity(Survey survey, QuestionType type ) {
+	public SurveyQuestion toEntity(Survey survey) {
 		return SurveyQuestion.builder()
 				.survey(survey)
 				.title(title)
 				.isRequired(required)
 				.ordering(ordering)
 				.questionType(type)
-				.optionNumber(option_number)
+				.optionNumber(optionNumber)
 				.build();
 	}
 

@@ -16,7 +16,7 @@ public class QuestionOption {
     private Long optionId;
 
     @ManyToOne
-    @JoinColumn(name="qeustion_id")
+    @JoinColumn(name="question_id")
     private SurveyQuestion surveyQuestion;
     private String value; //보기
     private int ordering;

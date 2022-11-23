@@ -2,7 +2,7 @@ package scratch.BackEnd.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import scratch.BackEnd.domain.AttendStatus;
+import scratch.BackEnd.type.AttendStatus;
 import scratch.BackEnd.domain.Survey;
 import scratch.BackEnd.domain.SurveyAttend;
 

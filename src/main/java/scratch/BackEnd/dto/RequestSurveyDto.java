@@ -2,7 +2,7 @@ package scratch.BackEnd.dto;
 
 import lombok.*;
 import scratch.BackEnd.domain.Survey;
-import scratch.BackEnd.domain.SurveyStatus;
+import scratch.BackEnd.type.SurveyStatus;
 import scratch.BackEnd.domain.User;
 
 import java.time.LocalDateTime;
@@ -14,19 +14,19 @@ import java.time.LocalDateTime;
 @ToString
 public class RequestSurveyDto {
 
-	private Long user_id;
+	private Long userId;
 	private String title;
 	private String description;
-	private boolean ask_age;
-	private boolean ask_gender;
-	private boolean is_private;
-	private int limit_person;
-	private LocalDateTime start_date;
-	private LocalDateTime end_date;
+	private boolean askAge;
+	private boolean askGender;
+	private boolean isPrivate;
+	private int limitPerson;
+	private LocalDateTime startDate;
+	private LocalDateTime endDate;
 	private int theme;
-	private int question_number;
+	private int questionNumber;
 
-	private RequestQuestionDto[] question_list;
+	private RequestQuestionDto[] questionList;
 
 	public Survey toEntity(User user, SurveyStatus status){
 		return Survey.builder()
@@ -34,13 +34,13 @@ public class RequestSurveyDto {
 				.title(title)
 				.description(description)
 				.status(status)
-				.askAge(ask_age)
-				.askGender(ask_gender)
-				.isPrivate(is_private)
-				.limitPerson(limit_person)
-				.surveyStartDate(start_date)
-				.surveyEndDate(end_date)
-				.questionNumber(question_number)
+				.askAge(askAge)
+				.askGender(askGender)
+				.isPrivate(isPrivate)
+				.limitPerson(limitPerson)
+				.surveyStartDate(startDate)
+				.surveyEndDate(endDate)
+				.questionNumber(questionNumber)
 				.themeType(theme)
 				.build();
 	}
