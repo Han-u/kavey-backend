@@ -21,15 +21,15 @@ public class AnswerSub {
     private SurveyQuestion surveyQuestion;
 
     @ManyToOne
-    @JoinColumn(name="user_id")
-    private User user;
+    @JoinColumn(name="attend_id")
+    private SurveyAttend surveyAttend;
 
 //    private Long surveyId;
     private String value; //주관식 답변
 
-    public AnswerSub(SurveyQuestion surveyQuestion, User user, String value){
+    public AnswerSub(SurveyQuestion surveyQuestion, SurveyAttend surveyAttend, String value){
         this.surveyQuestion = surveyQuestion;
-        this.user = user;
+        this.surveyAttend = surveyAttend;
         this.value = value;
     }
 }
