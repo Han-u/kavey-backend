@@ -30,7 +30,7 @@ public class SurveyService {
     private final MailUtil mailUtil;
 
 
-    public boolean makeSurvey(RequestSurveyDto requestSurveyDto){
+    public Long makeSurvey(RequestSurveyDto requestSurveyDto){
         //설문 생성
         User user = userRepository.findById(requestSurveyDto.getUserId()).orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다. id = " + requestSurveyDto.getUserId()));
         Survey survey = requestSurveyDto.toEntity(user, SurveyStatus.MAKING);
@@ -50,8 +50,24 @@ public class SurveyService {
 
         }
 
-        return true;
+        return surveySaved.getSurveyId();
     }
+
+    public Long editSurvey(Long surveyId, RequestSurveyDto requestSurveyDto){
+        //권환 확인 추가하기
+
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
+        // 설문하는 동안에는 수정 못하도록함
+        if (survey.getStatus() == SurveyStatus.PROGRESS){
+            throw new RuntimeException("진행중인 설문은 수정이 불가능합니다.");
+        }
+        deleteSurvey(surveyId);
+        Long newSurveyId = makeSurvey(requestSurveyDto);
+
+        return newSurveyId;
+    }
+
+
     public List<SurveyListDto> getSurveyList(String email){
         User user = userRepository.findByEmail(email);
         List<Survey> surveyList =  surveyRepository.findByUser(user);
