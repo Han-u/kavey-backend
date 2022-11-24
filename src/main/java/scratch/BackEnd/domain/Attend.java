@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SurveyAttend extends BaseTimeEntity {
+public class Attend extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long attendId;
@@ -21,9 +21,14 @@ public class SurveyAttend extends BaseTimeEntity {
     @JoinColumn(name="survey_id")
     private Survey survey;
 
-    private String sendEmail;
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    private User user;
+
     @Enumerated(EnumType.STRING)
     private AttendStatus status;
+
+    private String sendEmail;
     private LocalDateTime responseDate; //설문 응답 시간
     private LocalDateTime sendDate; //설문 보낸 시간
     private String gender; //성별

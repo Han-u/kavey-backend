@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import scratch.BackEnd.domain.Survey;
 import scratch.BackEnd.type.SurveyStatus;
+import scratch.BackEnd.type.SurveyTheme;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,7 +22,7 @@ public class ResponseSurveyDto {
 	private final LocalDateTime surveyEndDate;
 	private final String description;
 	private final int questionNumber;
-	private final int themeType;
+	private final SurveyTheme theme;
 	private final int limitPerson;
 	private final SurveyStatus status;
 	private final boolean isPrivate;
@@ -39,7 +40,7 @@ public class ResponseSurveyDto {
 		this.askAge = survey.isAskAge();
 		this.questionNumber = survey.getQuestionNumber();
 		this.ResponseSurveyQuestions = responseQuestionDto;
-		this.themeType = survey.getThemeType();
+		this.theme = survey.getTheme();
 		this.limitPerson = survey.getLimitPerson();
 		this.status = survey.getStatus();
 	}

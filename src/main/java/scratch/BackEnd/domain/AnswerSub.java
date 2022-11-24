@@ -22,14 +22,14 @@ public class AnswerSub {
 
     @ManyToOne
     @JoinColumn(name="attend_id")
-    private SurveyAttend surveyAttend;
+    private Attend attend;
 
 //    private Long surveyId;
     private String value; //주관식 답변
 
-    public AnswerSub(SurveyQuestion surveyQuestion, SurveyAttend surveyAttend, String value){
+    public AnswerSub(SurveyQuestion surveyQuestion, Attend attend, String value){
         this.surveyQuestion = surveyQuestion;
-        this.surveyAttend = surveyAttend;
+        this.attend = attend;
         this.value = value;
     }
 }

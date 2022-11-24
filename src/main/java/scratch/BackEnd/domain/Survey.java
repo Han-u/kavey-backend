@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import scratch.BackEnd.type.SurveyStatus;
+import scratch.BackEnd.type.SurveyTheme;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -37,10 +38,12 @@ public class Survey extends BaseTimeEntity{
     private LocalDateTime earlyEndDate;
     private String description;
     private int questionNumber;
-    private int themeType;
     private int limitPerson; //참여인원
     @Enumerated(EnumType.STRING)
     private SurveyStatus status;
+
+    @Enumerated(EnumType.STRING)
+    private SurveyTheme theme;
     private boolean isPrivate; //폐쇠,개방
     private boolean askGender; //성별포함
     private boolean askAge; //나이포함
@@ -48,7 +51,7 @@ public class Survey extends BaseTimeEntity{
 
     @Builder
     public Survey(User user, String title, String description, boolean askAge,
-                  boolean askGender, boolean isPrivate, int limitPerson, LocalDateTime startDate, LocalDateTime endDate, int questionNumber, int themeType, SurveyStatus status) {
+                  boolean askGender, boolean isPrivate, int limitPerson, LocalDateTime startDate, LocalDateTime endDate, int questionNumber, SurveyStatus status, SurveyTheme theme) {
         this.user = user;
         this.title = title;
         this.status = status;
@@ -60,6 +63,6 @@ public class Survey extends BaseTimeEntity{
         this.surveyStartDate = startDate;
         this.surveyEndDate = endDate;
         this.questionNumber = questionNumber;
-        this.themeType = themeType;
+        this.theme = theme;
     }
 }
