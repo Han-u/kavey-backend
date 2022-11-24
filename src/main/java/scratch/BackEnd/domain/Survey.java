@@ -29,7 +29,7 @@ public class Survey extends BaseTimeEntity{
     @JoinColumn(name="user_id")
     private User user;
 
-    @OneToMany(mappedBy= "survey")
+    @OneToMany(mappedBy= "survey", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval=true)
     private List<SurveyQuestion> surveyQuestions = new ArrayList<>(); // 읽기만 가능
 
     private String title;
@@ -64,5 +64,21 @@ public class Survey extends BaseTimeEntity{
         this.surveyEndDate = endDate;
         this.questionNumber = questionNumber;
         this.theme = theme;
+    }
+
+    public void update(Survey survey)
+    {
+        this.user = survey.getUser();
+        this.title = survey.getTitle();
+        this.status = survey.getStatus();
+        this.description = survey.getDescription();
+        this.askAge = survey.isAskAge();
+        this.askGender = survey.isAskGender();
+        this.isPrivate = survey.isPrivate();
+        this.limitPerson = survey.getLimitPerson();
+        this.surveyStartDate = survey.getSurveyStartDate();
+        this.surveyEndDate = survey.getSurveyEndDate();
+        this.questionNumber = survey.getQuestionNumber();
+        this.theme = survey.getTheme();
     }
 }

@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Where(clause = "is_deleted = false")
-@SQLDelete(sql= "UPDATE question SET is_deleted=true WHERE question_id = ?")
+@SQLDelete(sql= "UPDATE survey_question SET is_deleted=true WHERE question_id = ?")
 @ToString
 public class SurveyQuestion extends BaseTimeEntity{
 
@@ -28,6 +28,9 @@ public class SurveyQuestion extends BaseTimeEntity{
     @ManyToOne
     @JoinColumn(name="survey_id")
     private Survey survey;
+
+    @OneToMany(mappedBy= "surveyQuestion", cascade = CascadeType.ALL, orphanRemoval=true)
+    private List<QuestionOption> questionOptions = new ArrayList<>(); // 읽기만 가능
     @Enumerated(EnumType.STRING)
     private QuestionType questionType;
 
