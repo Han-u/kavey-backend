@@ -116,8 +116,12 @@ public class SurveyService {
             if (attend.getStatus() != AttendStatus.NONRESPONSE){
                 throw new RuntimeException("응답할 수 없는 설문입니다.");
             }
-            attend.setAge(requestSubmitSurveyDto.getAge());
-            attend.setGender(requestSubmitSurveyDto.getGender());
+            if (survey.isAskAge()){
+                attend.setAge(requestSubmitSurveyDto.getAge());
+            }
+            if (survey.isAskGender()){
+                attend.setGender(requestSubmitSurveyDto.getGender());
+            }
             attend.setStatus(AttendStatus.RESPONSE);
             attend.setResponseDate(LocalDateTime.now());
             surveyAttendRepository.save(attend);
@@ -133,8 +137,12 @@ public class SurveyService {
             Optional<Attend> optionalSurveyAttend = surveyAttendRepository.findBySurveyAndSendEmail(survey, email);
             if(optionalSurveyAttend.isPresent()){
                 attend = optionalSurveyAttend.get();
-                attend.setAge(requestSubmitSurveyDto.getAge());
-                attend.setGender(requestSubmitSurveyDto.getGender());
+                if (survey.isAskAge()){
+                    attend.setAge(requestSubmitSurveyDto.getAge());
+                }
+                if (survey.isAskGender()){
+                    attend.setGender(requestSubmitSurveyDto.getGender());
+                }
                 attend.setStatus(AttendStatus.RESPONSE);
                 attend.setResponseDate(LocalDateTime.now());
                 surveyAttendRepository.save(attend);
