@@ -24,6 +24,14 @@ public class SurveyController {
         return "";
     }
 
+    @PostMapping("/{surveyId}/edit")
+    public Long editSurvey(@PathVariable Long surveyId, @RequestBody RequestSurveyDto requestSurveyDto){
+        Long newSurveyId = surveyService.editSurvey(surveyId, requestSurveyDto);
+        return newSurveyId;
+    }
+
+
+
     @GetMapping("/{surveyId}/page")
     public ResponseSurveyDto getSurvey(@PathVariable Long surveyId){
         ResponseSurveyDto responseSurveyDto = surveyService.getSurvey(surveyId);
