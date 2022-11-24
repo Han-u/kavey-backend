@@ -1,6 +1,8 @@
 package scratch.BackEnd.domain;
 
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -10,6 +12,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Where(clause = "is_deleted = false")
+@SQLDelete(sql= "UPDATE survey SET is_deleted=true WHERE survey_id = ?")
 public class QuestionOption {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +25,7 @@ public class QuestionOption {
     private String value; //보기
     private int ordering;
     private String data;
+    private boolean isDeleted = Boolean.FALSE;
 
     @Builder
     public QuestionOption(SurveyQuestion question, String value, int ordering, String data) {
