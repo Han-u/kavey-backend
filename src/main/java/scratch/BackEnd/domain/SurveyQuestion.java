@@ -49,6 +49,7 @@ public class SurveyQuestion extends BaseTimeEntity{
         this.ordering = ordering;
         this.isRequired = isRequired;
         this.optionNumber = optionNumber;
-
     }
+
+
 }
