@@ -280,4 +280,43 @@ public class SurveyService {
         return surveyRepository.findAll();
     }
 
+    public void resendEmail(Long surveyId, RequestResendDto dto) {
+        // 1. 설문지 검증
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
+        // 1-1. 상태값 확인
+        if (survey.getStatus() != SurveyStatus.PROGRESS){
+            throw new RuntimeException("진행 중인 설문이 아닙니다.");
+        }
+
+        // 1-2. 끝난 설문은 이메일 재전송 불가능
+        if (survey.getEarlyEndDate() != null){
+            throw new RuntimeException("이미 끝난 설문은 이메일 전송이 불가능합니다.");
+        }
+
+        // 1-3. 설문 응답 기간이 지난 설문은 이메일 재전송 불가능
+        LocalDateTime endDate = survey.getSurveyEndDate();
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isAfter(endDate)){
+            throw new RuntimeException("응답 기간이 지난 설문은 이메일 전송이 불가능합니다.");
+        }
+
+        // 2. user 검증
+        List<Attend> userList = surveyAttendRepository.findBySurveyAndStatusAndUser_IdIn(survey, AttendStatus.NONRESPONSE,dto.getUserIdList());
+
+        // 3. email 일괄 전송
+        String[] email = userList.stream().map(Attend::getSendEmail).toArray(String[]::new);
+        String subject = "설문에 참여해주세요!";
+        String text = "<p>다음 설문에 응답해주세요!</p> <p>링크클릭</p>" +
+                "<div><a href='#'>설문 응답하러가기</a></div>";
+        mailUtil.bulkSendMail(email, subject, text);
+
+
+
+        // 4. send date 업데이트
+        for(Attend attend: userList){
+            attend.setSendDate(LocalDateTime.now());
+        }
+        surveyAttendRepository.saveAll(userList);
+
+    }
 }

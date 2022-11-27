@@ -77,4 +77,10 @@ public class SurveyController {
         surveyService.addSurveyReceiver(surveyId, dto);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/{surveyId}/email-resend")
+    public ResponseEntity<?> resendEmail(@PathVariable Long surveyId, @RequestBody RequestResendDto dto){
+        surveyService.resendEmail(surveyId, dto);
+        return ResponseEntity.ok().build();
+    }
 }
