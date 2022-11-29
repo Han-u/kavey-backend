@@ -13,7 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Builder
 @Where(clause = "is_deleted = false")
-@SQLDelete(sql= "UPDATE survey SET is_deleted=true WHERE survey_id = ?")
+@SQLDelete(sql= "UPDATE question_option SET is_deleted=true WHERE option_id = ?")
 public class QuestionOption {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

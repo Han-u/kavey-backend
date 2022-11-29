@@ -16,7 +16,7 @@ import java.util.List;
 
 public class ResponseSurveyDto {
 	private final Long surveyId;
-	private final List<ResponseQuestionDto> ResponseSurveyQuestions;
+	private final List<ResponseQuestionDto> questionList;
 	private final String title;
 	private final LocalDateTime surveyStartDate;
 	private final LocalDateTime surveyEndDate;
@@ -39,7 +39,7 @@ public class ResponseSurveyDto {
 		this.askGender = survey.isAskGender();
 		this.askAge = survey.isAskAge();
 		this.questionNumber = survey.getQuestionNumber();
-		this.ResponseSurveyQuestions = responseQuestionDto;
+		this.questionList = responseQuestionDto;
 		this.theme = survey.getTheme();
 		this.limitPerson = survey.getLimitPerson();
 		this.status = survey.getStatus();

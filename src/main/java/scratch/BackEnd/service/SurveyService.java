@@ -2,16 +2,16 @@ package scratch.BackEnd.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import scratch.BackEnd.components.MailUtil;
 import scratch.BackEnd.domain.*;
 import scratch.BackEnd.dto.*;
 import scratch.BackEnd.repository.*;
-import org.springframework.transaction.annotation.Transactional;
 import scratch.BackEnd.type.AttendStatus;
 import scratch.BackEnd.type.SurveyStatus;
 
-import java.util.ArrayList;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,11 +34,16 @@ public class SurveyService {
         //설문 생성
         User user = userRepository.findById(requestSurveyDto.getUserId()).orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다. id = " + requestSurveyDto.getUserId()));
         Survey survey = requestSurveyDto.toEntity(user, SurveyStatus.MAKING);
-        Survey surveySaved = surveyRepository.save(survey);
 
+        Survey surveySaved = surveyRepository.save(survey);
+        makeQuestion(surveySaved, requestSurveyDto.getQuestionList());
+
+        return surveySaved.getSurveyId();
+    }
+
+    private void makeQuestion(Survey surveySaved, RequestQuestionDto[] questionDtos) {
         //질문 생성
-        for(int i = 0; i<surveySaved.getQuestionNumber(); i++){
-            RequestQuestionDto questionDto = requestSurveyDto.getQuestionList()[i];
+        for(RequestQuestionDto questionDto: questionDtos){
             SurveyQuestion question = questionDto.toEntity(surveySaved);
             SurveyQuestion questionSaved = surveyQuestionRepository.save(question);
             //보기 생성
@@ -47,11 +52,9 @@ public class SurveyService {
                 QuestionOption questionOption = questionOptionDto.toEntity(questionSaved);
                 QuestionOption questionOptionSaved = questionOptionRepository.save(questionOption);
             }
-
         }
-
-        return surveySaved.getSurveyId();
     }
+
 
     public Long editSurvey(Long surveyId, RequestSurveyDto requestSurveyDto){
         //권환 확인 추가하기
@@ -61,10 +64,26 @@ public class SurveyService {
         if (survey.getStatus() == SurveyStatus.PROGRESS){
             throw new RuntimeException("진행중인 설문은 수정이 불가능합니다.");
         }
-        deleteSurvey(surveyId);
-        Long newSurveyId = makeSurvey(requestSurveyDto);
 
-        return newSurveyId;
+        User user = userRepository.findById(requestSurveyDto.getUserId()).orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다. id = " + requestSurveyDto.getUserId()));
+
+
+//        surveyQuestionRepository.deleteBySurvey(survey);
+
+//        for(SurveyQuestion surveyQuestion : survey.getSurveyQuestions()) {
+//            surveyQuestionRepository.deleteById(surveyQuestion.getQuestionId());
+//        }
+
+        List<SurveyQuestion> toBeRemoved = survey.getSurveyQuestions();
+        survey.getSurveyQuestions().removeAll(toBeRemoved);
+
+
+        survey.update(requestSurveyDto.toEntity(user, survey.getStatus()));
+        Survey surveySaved = surveyRepository.save(survey);
+        makeQuestion(survey, requestSurveyDto.getQuestionList());
+
+
+        return surveySaved.getSurveyId();
     }
 
 
@@ -92,6 +111,8 @@ public class SurveyService {
 
         surveyRepository.deleteById(surveyId);
     }
+
+
 
     public void closeSurvey(Long surveyId){
         // 설문지 조회
