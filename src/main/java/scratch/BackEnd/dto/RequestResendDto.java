@@ -12,5 +12,5 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class RequestResendDto {
-    private List<Long> userIdList;
+    private List<Long> attendIdList;
 }

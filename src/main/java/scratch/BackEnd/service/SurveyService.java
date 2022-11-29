@@ -301,7 +301,7 @@ public class SurveyService {
         }
 
         // 2. user 검증
-        List<Attend> userList = surveyAttendRepository.findBySurveyAndStatusAndUser_IdIn(survey, AttendStatus.NONRESPONSE,dto.getUserIdList());
+        List<Attend> userList = surveyAttendRepository.findBySurveyAndStatusAndAttendIdIn(survey, AttendStatus.NONRESPONSE,dto.getAttendIdList());
 
         // 3. email 일괄 전송
         String[] email = userList.stream().map(Attend::getSendEmail).toArray(String[]::new);

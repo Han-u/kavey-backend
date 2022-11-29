@@ -16,4 +16,6 @@ public interface SurveyAttendRepository extends JpaRepository<Attend, Long> {
     Integer countBySurveyAndStatus(Survey survey, AttendStatus status);
 
     List<Attend> findBySurveyAndStatusAndUser_IdIn(Survey survey, AttendStatus status,List<Long> userIdList);
+
+    List<Attend> findBySurveyAndStatusAndAttendIdIn(Survey survey, AttendStatus status, List<Long> surveyId);
 }
