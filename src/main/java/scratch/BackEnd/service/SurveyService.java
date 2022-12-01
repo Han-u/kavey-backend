@@ -1,9 +1,11 @@
 package scratch.BackEnd.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import scratch.BackEnd.components.MailUtil;
+import scratch.BackEnd.components.SurveyScheduler;
 import scratch.BackEnd.domain.*;
 import scratch.BackEnd.dto.*;
 import scratch.BackEnd.repository.*;
@@ -30,6 +32,23 @@ public class SurveyService {
     private final MailUtil mailUtil;
 
 
+    private final SurveyScheduleRepository surveyScheduleRepository;
+
+    public void addSurveySchedule(Survey survey){
+        SurveySchedule surveyStartSchedule = new SurveySchedule(survey,survey.getSurveyStartDate(), SurveyStatus.PROGRESS);
+        SurveySchedule surveyEndSchedule = new SurveySchedule(survey,survey.getSurveyEndDate(), SurveyStatus.DONE);
+        surveyScheduleRepository.save(surveyStartSchedule);
+        surveyScheduleRepository.save(surveyEndSchedule);
+    }
+
+    public void removeSurveySchedule(Survey survey){
+        surveyScheduleRepository.deleteAllBySurvey(survey);
+    }
+    public void updateSurveySchedule(Survey survey){
+        this.removeSurveySchedule(survey);
+        this.addSurveySchedule(survey);
+    }
+
     public Long makeSurvey(RequestSurveyDto requestSurveyDto){
         //설문 생성
         User user = userRepository.findById(requestSurveyDto.getUserId()).orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다. id = " + requestSurveyDto.getUserId()));
@@ -37,6 +56,8 @@ public class SurveyService {
 
         Survey surveySaved = surveyRepository.save(survey);
         makeQuestion(surveySaved, requestSurveyDto.getQuestionList());
+
+        addSurveySchedule(surveySaved); //스케줄에 추가
 
         return surveySaved.getSurveyId();
     }
@@ -57,8 +78,8 @@ public class SurveyService {
 
 
     public Long editSurvey(Long surveyId, RequestSurveyDto requestSurveyDto){
+        System.out.println("설문 수정 : " + surveyId);
         //권환 확인 추가하기
-
         Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
         // 설문하는 동안에는 수정 못하도록함
         if (survey.getStatus() == SurveyStatus.PROGRESS){
@@ -82,7 +103,7 @@ public class SurveyService {
         Survey surveySaved = surveyRepository.save(survey);
         makeQuestion(survey, requestSurveyDto.getQuestionList());
 
-
+        updateSurveySchedule(surveySaved);
         return surveySaved.getSurveyId();
     }
 
@@ -94,6 +115,7 @@ public class SurveyService {
     }
 
     public void deleteSurvey(Long surveyId){
+        System.out.println("설문 삭제 : " + surveyId);
         // 설문지 조회
         Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
 
@@ -108,13 +130,27 @@ public class SurveyService {
         if (survey.getStatus() == SurveyStatus.PROGRESS){
             throw new RuntimeException("진행중인 설문은 삭제가 불가능합니다.");
         }
-
+//        surveyScheduler.removeSurveySchedule(survey);       //스케줄에서 삭제
+        removeSurveySchedule(survey);       //스케줄에서 삭제
         surveyRepository.deleteById(surveyId);
     }
 
 
 
+    public void startSurvey(Long surveyId){ //설문 시작
+        System.out.println("설문 시작 : " + surveyId);
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
+
+        survey.setStatus(SurveyStatus.PROGRESS);    //상태 바꾸기
+
+        //필요한기능 있으면 넣기
+
+        //설문 시작시 제작자한테 알림 메일보내기라든가...
+
+        surveyRepository.save(survey);
+    }
     public void closeSurvey(Long surveyId){
+        System.out.println("설문 종료 : " + surveyId);
         // 설문지 조회
         Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
 
@@ -132,6 +168,7 @@ public class SurveyService {
 
         survey.setEarlyEndDate(LocalDateTime.now());
         survey.setStatus(SurveyStatus.DONE);
+        removeSurveySchedule(survey);
         surveyRepository.save(survey);
     }
 
