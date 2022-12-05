@@ -19,4 +19,5 @@ public interface SurveyQuestionRepository extends JpaRepository<SurveyQuestion, 
 	long deleteBySurvey(Survey survey);
 
 
+	List<SurveyQuestion> findAllBySurvey(Survey survey);
 }

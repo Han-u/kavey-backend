@@ -26,4 +26,5 @@ public class SurveyReceiverDto {
                 .sendDate(attend.getSendDate())
                 .build();
     }
+
 }

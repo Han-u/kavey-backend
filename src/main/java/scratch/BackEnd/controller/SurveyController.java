@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import scratch.BackEnd.dto.*;
-import scratch.BackEnd.domain.Survey;
 import scratch.BackEnd.dto.RequestSurveyDto;
+import scratch.BackEnd.service.SurveyResultService;
 import scratch.BackEnd.service.SurveyService;
 
 import java.util.List;
@@ -16,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class SurveyController {
     private final SurveyService surveyService;
+    private final SurveyResultService surveyResultService;
 
     @PostMapping("")
     public String createSurvey(@RequestBody RequestSurveyDto requestSurveyDto){
@@ -88,5 +89,13 @@ public class SurveyController {
     public ResponseEntity<?> sendEmail(@PathVariable Long surveyId, @RequestBody RequestSendDto dto){
         surveyService.sendEmail(surveyId, dto);
         return ResponseEntity.ok().build();
+    }
+
+
+    @GetMapping("/{surveyId}/result/attend/{attendId}")
+    public ResponseUserAnswerTotalDto getUserAnswer(@PathVariable Long surveyId, @PathVariable Long attendId){
+        ResponseUserAnswerTotalDto responseUserAnswerTotalDto = surveyResultService.getUserAnswer(surveyId,attendId);
+
+        return responseUserAnswerTotalDto;
     }
 }
