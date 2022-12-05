@@ -106,4 +106,10 @@ public class SurveyController {
         userList = surveyService.getAttendUserList(surveyId);
         return userList;
     }
+
+    @GetMapping("/{surveyId}/result/attends")
+    public ResponseAllAnswerDto getAllAnswer(@PathVariable Long surveyId){
+        ResponseAllAnswerDto responseAllAnswerDto = surveyResultService.getAllAnswer(surveyId);
+        return responseAllAnswerDto;
+    }
 }
