@@ -9,6 +9,7 @@ import scratch.BackEnd.dto.RequestSurveyDto;
 import scratch.BackEnd.service.SurveyResultService;
 import scratch.BackEnd.service.SurveyService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -97,5 +98,12 @@ public class SurveyController {
         ResponseUserAnswerTotalDto responseUserAnswerTotalDto = surveyResultService.getUserAnswer(surveyId,attendId);
 
         return responseUserAnswerTotalDto;
+    }
+
+    @GetMapping("/{surveyId}/result/user")
+    public List<String> getAttendUserList(@PathVariable Long surveyId){
+        List<String> userList = new ArrayList<>();
+        userList = surveyService.getAttendUserList(surveyId);
+        return userList;
     }
 }
