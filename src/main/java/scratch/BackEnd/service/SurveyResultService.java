@@ -6,6 +6,7 @@ import scratch.BackEnd.domain.*;
 import scratch.BackEnd.dto.ResponseUserAnswerDto;
 import scratch.BackEnd.dto.ResponseUserAnswerTotalDto;
 import scratch.BackEnd.repository.*;
+import scratch.BackEnd.type.AttendStatus;
 import scratch.BackEnd.type.QuestionType;
 
 import java.util.ArrayList;
@@ -34,6 +35,9 @@ public class SurveyResultService {
 	}
 	public ResponseUserAnswerTotalDto getUserAnswer(Long surveyId, Long attendId) {
 		Attend attend = surveyAttendRepository.findById(attendId).orElseThrow(() -> new IllegalArgumentException("해당 참여정보는 없습니다. attend id = " + attendId));
+		if(attend.getStatus() != AttendStatus.RESPONSE){
+			throw new IllegalArgumentException("답변하지 않은 유저입니다.");
+		}
 		Survey survey = surveyRepository.findById(attend.getSurvey().getSurveyId()).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
 		User user = userRepository.findById(attend.getUser().getId()).orElseThrow(() -> new IllegalArgumentException("해당 유저는 없습니다. id = " + attend.getUser().getId() ));
 
@@ -53,7 +57,7 @@ public class SurveyResultService {
 			responseUserAnswerDtos.add(new ResponseUserAnswerDto(user.getId(), answerMulti, findQuestionType(surveyQuestions,answerMulti.getSurveyQuestion().getQuestionId())));
 		}
 
-		Collections.sort(responseUserAnswerDtos, Comparator.comparing(responseUserAnswerDto -> responseUserAnswerDto.getQuestionId()));
+		Collections.sort(responseUserAnswerDtos, Comparator.comparing(ResponseUserAnswerDto::getQuestionId));
 
 		ResponseUserAnswerTotalDto userAnswer = new ResponseUserAnswerTotalDto(user.getId(), surveyId,attendId, responseUserAnswerDtos);
 
