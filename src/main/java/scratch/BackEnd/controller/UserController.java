@@ -3,8 +3,11 @@ package scratch.BackEnd.controller;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import scratch.BackEnd.config.jwt.JwtProperties;
+import scratch.BackEnd.domain.User;
 import scratch.BackEnd.dto.kakaoLoginDto.KakaoToken;
 import scratch.BackEnd.service.UserService;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 @RestController
@@ -41,6 +44,4 @@ public class UserController {
 
         return ResponseEntity.ok().body(user);
     }
-}
-
 }
