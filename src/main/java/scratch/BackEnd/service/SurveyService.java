@@ -1,11 +1,9 @@
 package scratch.BackEnd.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import scratch.BackEnd.components.MailUtil;
-import scratch.BackEnd.components.SurveyScheduler;
 import scratch.BackEnd.domain.*;
 import scratch.BackEnd.dto.*;
 import scratch.BackEnd.repository.*;
@@ -13,7 +11,9 @@ import scratch.BackEnd.type.AttendStatus;
 import scratch.BackEnd.type.SurveyStatus;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -295,11 +295,9 @@ public class SurveyService {
         }
 
         // 이메일 전송하는 부분 나중에 수정
-        String email = dto.getEmail();
-        String subject = "설문에 참여해주세요!";
-        String text = "<p>다음 설문에 응답해주세요!</p> <p>링크클릭</p>" +
-                "<div><a href='#'>설문 응답하러가기</a></div>";
-        mailUtil.sendMail(email, subject, text);
+        String[] emailList = {dto.getEmail()};
+        HashMap<String, String> emailValues = getEmailInviteContext(survey);
+        mailUtil.sendSurveyInviteMail(emailValues, emailList);
 
 
         // 추가함
@@ -362,11 +360,10 @@ public class SurveyService {
         List<Attend> userList = surveyAttendRepository.findBySurveyAndStatusAndAttendIdIn(survey, AttendStatus.NONRESPONSE,dto.getAttendIdList());
 
         // 3. email 일괄 전송
-        String[] email = userList.stream().map(Attend::getSendEmail).toArray(String[]::new);
-        String subject = "설문에 참여해주세요!";
-        String text = "<p>다음 설문에 응답해주세요!</p> <p>링크클릭</p>" +
-                "<div><a href='#'>설문 응답하러가기</a></div>";
-        mailUtil.bulkSendMail(email, subject, text);
+        String[] emailList = userList.stream().map(Attend::getSendEmail).toArray(String[]::new);
+        HashMap<String, String> emailValues = getEmailInviteContext(survey);
+
+        mailUtil.sendSurveyInviteMail(emailValues, emailList);
 
 
 
@@ -418,12 +415,18 @@ public class SurveyService {
 
 
         // 3. email 일괄 전송
-        String subject = "설문에 참여해주세요!";
-        String text = "<p>다음 설문에 응답해주세요!</p> <p>링크클릭</p>" +
-                "<div><a href='#'>설문 응답하러가기</a></div>";
-        String[] array = sendEmails.toArray(new String[0]);
-        mailUtil.bulkSendMail(array, subject, text);
+        String[] emailList = sendEmails.toArray(new String[0]);
+        HashMap<String, String> emailValues = getEmailInviteContext(survey);
+        mailUtil.sendSurveyInviteMail(emailValues, emailList);
+    }
 
+
+    public HashMap<String, String> getEmailInviteContext(Survey survey){
+        HashMap<String, String> emailValues = new HashMap<>();
+        emailValues.put("senderName", survey.getUser().getNickname());
+        emailValues.put("startDate", survey.getSurveyStartDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
+        emailValues.put("endDate", survey.getSurveyEndDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
+        return emailValues;
     }
 
     public List<String> getAttendUserList(Long surveyId) {
