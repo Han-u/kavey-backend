@@ -1,5 +1,5 @@
-FROM openjdk:11-jdk
-# JAR_FILE 변수 정의 -> 기본적으로 jar file이 2개이기 때문에 이름을 특정해야함
-ARG JAR_FILE=./build/libs/Back-End-0.0.1-SNAPSHOT.jar
-# 시스템 진입점 정의
-ENTRYPOINT ["java","-jar",${JAR_FILE}]
+FROM adoptopenjdk/openjdk11
+CMD ["./mvnw", "clean", "package"]
+ARG JAR_FILE_PATH=target/*.jar
+COPY ${JAR_FILE_PATH} app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
