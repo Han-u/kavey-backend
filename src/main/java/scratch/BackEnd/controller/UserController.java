@@ -34,4 +34,13 @@ public class UserController {
         return ResponseEntity.ok().headers(headers).body("success");
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<Object> getCurrentUser(HttpServletRequest request) {
+
+        User user = userService.getUser(request);
+
+        return ResponseEntity.ok().body(user);
+    }
+}
+
 }

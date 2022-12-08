@@ -140,6 +140,7 @@ public class UserService {
         Long kakaoid = (Long) request.getAttribute("kakaoid");
         System.out.println(kakaoid);
 
+        // db 에서 사용자 정보 가져와서 객체에 담기
         User user = userRepository.findByKakaoid(kakaoid)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 없습니다. id=" + kakaoid));
 
