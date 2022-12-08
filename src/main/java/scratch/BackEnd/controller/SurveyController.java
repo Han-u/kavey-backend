@@ -6,8 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import scratch.BackEnd.dto.*;
 import scratch.BackEnd.dto.RequestSurveyDto;
+import scratch.BackEnd.service.SurveyResultService;
 import scratch.BackEnd.service.SurveyService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -15,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class SurveyController {
     private final SurveyService surveyService;
+    private final SurveyResultService surveyResultService;
 
     @PostMapping("")
     public String createSurvey(@RequestBody RequestSurveyDto requestSurveyDto){
@@ -87,5 +90,26 @@ public class SurveyController {
     public ResponseEntity<?> sendEmail(@PathVariable Long surveyId, @RequestBody RequestSendDto dto){
         surveyService.sendEmail(surveyId, dto);
         return ResponseEntity.ok().build();
+    }
+
+
+    @GetMapping("/{surveyId}/result/attend/{attendId}")
+    public ResponseUserAnswerTotalDto getUserAnswer(@PathVariable Long surveyId, @PathVariable Long attendId){
+        ResponseUserAnswerTotalDto responseUserAnswerTotalDto = surveyResultService.getUserAnswer(surveyId,attendId);
+
+        return responseUserAnswerTotalDto;
+    }
+
+    @GetMapping("/{surveyId}/result/user")
+    public List<String> getAttendUserList(@PathVariable Long surveyId){
+        List<String> userList = new ArrayList<>();
+        userList = surveyService.getAttendUserList(surveyId);
+        return userList;
+    }
+
+    @GetMapping("/{surveyId}/result/attends")
+    public ResponseAllAnswerDto getAllAnswer(@PathVariable Long surveyId){
+        ResponseAllAnswerDto responseAllAnswerDto = surveyResultService.getAllAnswer(surveyId);
+        return responseAllAnswerDto;
     }
 }

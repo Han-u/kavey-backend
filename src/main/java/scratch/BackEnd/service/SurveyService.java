@@ -428,4 +428,17 @@ public class SurveyService {
         emailValues.put("endDate", survey.getSurveyEndDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
         return emailValues;
     }
+
+    public List<String> getAttendUserList(Long surveyId) {
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
+
+        List<String> userList = new ArrayList<>();
+
+        List<Attend> attendList = surveyAttendRepository.findBySurveyAndStatus(survey, AttendStatus.RESPONSE);
+
+        for (Attend attend : attendList) {
+            userList.add(attend.getSendEmail());
+        }
+        return userList;
+    }
 }
