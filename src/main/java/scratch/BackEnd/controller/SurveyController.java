@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import scratch.BackEnd.dto.*;
-import scratch.BackEnd.domain.Survey;
 import scratch.BackEnd.dto.RequestSurveyDto;
 import scratch.BackEnd.service.SurveyService;
 
