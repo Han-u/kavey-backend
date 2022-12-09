@@ -28,6 +28,7 @@ public class UserController {
         // 넘어온 인가 코드를 통해 access_token 발급
         KakaoToken oauthToken = userService.getAccessToken(code);
 
+
         // 발급 받은 accessToken 으로 카카오 회원 정보 DB 저장
         String jwtToken = userService.SaveUserAndGetToken(oauthToken.getAccess_token());
 
@@ -38,10 +39,8 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<Object> getCurrentUser(HttpServletRequest request) {
+    public User getCurrentUser(HttpServletRequest request) {
 
-        User user = userService.getUser(request);
-
-        return ResponseEntity.ok().body(user);
+        return userService.getUser(request);
     }
 }

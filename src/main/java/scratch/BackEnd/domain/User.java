@@ -16,7 +16,7 @@ public class User extends BaseTimeEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy= "user")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy= "user")
     private List<Survey> surveys = new ArrayList<>(); // 읽기만 가능
     private Long kakaoid;
     private String nickname ;
