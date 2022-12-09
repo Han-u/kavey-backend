@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import scratch.BackEnd.components.MailUtil;
 import scratch.BackEnd.domain.*;
 import scratch.BackEnd.dto.*;
+import scratch.BackEnd.exception.CustomException;
+import scratch.BackEnd.exception.ErrorCode;
 import scratch.BackEnd.repository.*;
 import scratch.BackEnd.type.AttendStatus;
 import scratch.BackEnd.type.SurveyStatus;
@@ -115,9 +117,8 @@ public class SurveyService {
     }
 
     public void deleteSurvey(Long surveyId){
-        System.out.println("설문 삭제 : " + surveyId);
         // 설문지 조회
-        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
 
         // 해당 유저에게 권한이 있는지 확인
         // 카카오 인증 추가되면 수정함
@@ -128,7 +129,7 @@ public class SurveyService {
 
         // 설문하는 동안에는 삭제 못하도록함
         if (survey.getStatus() == SurveyStatus.PROGRESS){
-            throw new RuntimeException("진행중인 설문은 삭제가 불가능합니다.");
+            throw new CustomException(ErrorCode.PROGRESS_CANNOT_BE_MODIFIED);
         }
 //        surveyScheduler.removeSurveySchedule(survey);       //스케줄에서 삭제
         removeSurveySchedule(survey);       //스케줄에서 삭제
@@ -150,20 +151,19 @@ public class SurveyService {
         surveyRepository.save(survey);
     }
     public void closeSurvey(Long surveyId){
-        System.out.println("설문 종료 : " + surveyId);
         // 설문지 조회
-        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
 
         // 해당 유저에게 권한이 있는지 확인
 
         // 설문 진행중인 설문만 조기종료 가능
         if (survey.getStatus() != SurveyStatus.PROGRESS){
-            throw new RuntimeException("진행중인 설문만 조기종료가 가능합니다.");
+            throw new CustomException(ErrorCode.ONLY_PROGRESS_CAN_EARLY_CLOSE);
         }
 
         // 이미 조기 종료된 설문도 조기종료 불가능
         if (survey.getEarlyEndDate() != null){
-            throw new RuntimeException("이미 종료된 설문입니다.");
+            throw new CustomException(ErrorCode.SURVEY_ALREADY_BEEN_COMPLETED);
         }
 
         survey.setEarlyEndDate(LocalDateTime.now());
@@ -178,7 +178,7 @@ public class SurveyService {
     @Transactional
     public void submitSurvey(RequestSubmitSurveyDto requestSubmitSurveyDto, Long surveyId, String email) {
         // 1. 해당 설문지 찾기
-        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
         Attend attend;
         isValidSurvey(survey);
 
@@ -186,9 +186,9 @@ public class SurveyService {
             // 1. 폐쇄형인 경우
             // 1-1. 해당 설문에 대한 참여 권한이 있는지
             attend = surveyAttendRepository.findBySurveyAndSendEmail(survey, email)
-                    .orElseThrow(() -> new RuntimeException("참여 권한이 없습니다."));
+                    .orElseThrow(() -> new CustomException(ErrorCode.DOES_NOT_HAVE_PERMISSION));
             if (attend.getStatus() != AttendStatus.NONRESPONSE){
-                throw new RuntimeException("응답할 수 없는 설문입니다.");
+                throw new CustomException(ErrorCode.SURVEY_STATUS_IS_NOT_PROGRESS);
             }
             if (survey.isAskAge()){
                 attend.setAge(requestSubmitSurveyDto.getAge());
@@ -206,7 +206,7 @@ public class SurveyService {
             // 2-1. 참여 제한에 걸려있는지?
             int participants = surveyAttendRepository.countBySurveyAndStatus(survey, AttendStatus.RESPONSE);
             if (survey.getLimitPerson() <= participants){
-                throw new RuntimeException("선착순 끝~ 더빨리 움직이셈ㅋㅋ");
+                throw new CustomException(ErrorCode.FIRST_COME_FIRST_SERVED_OVER);
             }
             Optional<Attend> optionalSurveyAttend = surveyAttendRepository.findBySurveyAndSendEmail(survey, email);
             if(optionalSurveyAttend.isPresent()){
@@ -265,13 +265,13 @@ public class SurveyService {
         LocalDateTime now = LocalDateTime.now();
 
         if(!isBetweenDay(now, startDate, endDate)){
-            throw new RuntimeException("응답 가능한 날짜가 아닙니다.");
+            throw new CustomException(ErrorCode.DATE_NOT_AVAILABLE_RESPONSE);
         }
 
         // 1-2. 해당 설문이 응답 가능한 상태인지
         SurveyStatus status = survey.getStatus();
         if (status != SurveyStatus.PROGRESS){
-            throw new RuntimeException("응답 가능한 설문이 아닙니다.");
+            throw new CustomException(ErrorCode.SURVEY_STATUS_IS_NOT_PROGRESS);
         }
 
     }
@@ -286,12 +286,12 @@ public class SurveyService {
 
     public void addSurveyReceiver(Long surveyId, RequestAddSurveyReceiverDto dto) {
         // 해당 설문이 있는지 확인
-        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
 
         // 이미 추가된 이메일인지 확인
         Optional<Attend> attend = surveyAttendRepository.findBySurveyAndSendEmail(survey, dto.getEmail());
         if (attend.isPresent()) {
-            throw new RuntimeException("이미 추가된 이메일 입니다.");
+            throw new CustomException(ErrorCode.EMAIL_ALREADY_ADDED);
         }
 
         // 이메일 전송하는 부분 나중에 수정
@@ -338,22 +338,22 @@ public class SurveyService {
 
     public void resendEmail(Long surveyId, RequestResendDto dto) {
         // 1. 설문지 검증
-        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
         // 1-1. 상태값 확인
         if (survey.getStatus() != SurveyStatus.PROGRESS){
-            throw new RuntimeException("진행 중인 설문이 아닙니다.");
+            throw new CustomException(ErrorCode.SURVEY_STATUS_IS_NOT_PROGRESS);
         }
 
         // 1-2. 끝난 설문은 이메일 재전송 불가능
         if (survey.getEarlyEndDate() != null){
-            throw new RuntimeException("이미 끝난 설문은 이메일 전송이 불가능합니다.");
+            throw new CustomException(ErrorCode.EARLY_CLOSED_SURVEY);
         }
 
         // 1-3. 설문 응답 기간이 지난 설문은 이메일 재전송 불가능
         LocalDateTime endDate = survey.getSurveyEndDate();
         LocalDateTime now = LocalDateTime.now();
         if (now.isAfter(endDate)){
-            throw new RuntimeException("응답 기간이 지난 설문은 이메일 전송이 불가능합니다.");
+            throw new CustomException(ErrorCode.DATE_NOT_AVAILABLE_RESPONSE);
         }
 
         // 2. user 검증
@@ -377,22 +377,22 @@ public class SurveyService {
 
     public void sendEmail(Long surveyId, RequestSendDto dto){
         // 1. 설문지 검증
-        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
         // 1-1. 상태값 확인
         if (survey.getStatus() != SurveyStatus.PROGRESS){
-            throw new RuntimeException("진행 중인 설문이 아닙니다.");
+            throw new CustomException(ErrorCode.SURVEY_STATUS_IS_NOT_PROGRESS);
         }
 
         // 1-2. 끝난 설문은 이메일 재전송 불가능
         if (survey.getEarlyEndDate() != null){
-            throw new RuntimeException("이미 끝난 설문은 이메일 전송이 불가능합니다.");
+            throw new CustomException(ErrorCode.EARLY_CLOSED_SURVEY);
         }
 
         // 1-3. 설문 응답 기간이 지난 설문은 이메일 재전송 불가능
         LocalDateTime endDate = survey.getSurveyEndDate();
         LocalDateTime now = LocalDateTime.now();
         if (now.isAfter(endDate)){
-            throw new RuntimeException("응답 기간이 지난 설문은 이메일 전송이 불가능합니다.");
+            throw new CustomException(ErrorCode.DATE_NOT_AVAILABLE_RESPONSE);
         }
 
 
