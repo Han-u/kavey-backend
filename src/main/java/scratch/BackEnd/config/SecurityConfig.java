@@ -20,6 +20,7 @@ import scratch.BackEnd.repository.UserRepository;
 public class SecurityConfig {
 
     public static final String FRONT_URL = "http://localhost:3000";
+    public static final String BACK_URL = "http://localhost:8081";
 
     @Autowired
     UserRepository userRepository;
@@ -38,8 +39,9 @@ public class SecurityConfig {
                 .addFilter(corsFilter); // @CrossOrigin(인증X), 시큐리티 필터에 등록 인증(O)
 
         http.authorizeRequests()
-                .antMatchers(FRONT_URL).permitAll() // 메인만 접근 허용
-                .anyRequest().authenticated() // 나머지 모두 인증 필요
+               .antMatchers(FRONT_URL+"/**", BACK_URL+"/**").permitAll() // 접근 허용
+               //.anyRequest().authenticated() // 나머지 모두 인증 필요
+
 
                 .and()
                 .exceptionHandling()
