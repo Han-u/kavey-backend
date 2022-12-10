@@ -112,4 +112,10 @@ public class SurveyController {
         ResponseAllAnswerDto responseAllAnswerDto = surveyResultService.getAllAnswer(surveyId);
         return responseAllAnswerDto;
     }
+
+    @GetMapping("/{surveyId}/result")
+    public ResponseSurveyResultDto getSurveyResult(@PathVariable Long surveyId){
+        ResponseSurveyResultDto responseSurveyResultDto = surveyResultService.getSurveyResult(surveyId);
+        return responseSurveyResultDto;
+    }
 }
