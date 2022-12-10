@@ -10,6 +10,7 @@ import scratch.BackEnd.type.QuestionType;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @AllArgsConstructor
@@ -87,19 +88,75 @@ public class SurveyResultService {
 		for (SurveyQuestion question : surveyQuestions) {
 			switch (question.getQuestionType()) {
 				case TEXT:
+				{
 					List<AnswerSub> answerSubs = answerSubRepository.findBySurveyQuestion(question);
 					responseQuestionResultList.add(new ResponseQuestionResultDto(question.getQuestionId(), question.getQuestionType(), answerSubs.size(), countSubResult(answerSubs)));
 					break;
-				default:
+				}
+				case RATING:{
+					List<AnswerSub> answerSubs = answerSubRepository.findBySurveyQuestion(question);
+					responseQuestionResultList.add(new ResponseQuestionResultDto(question.getQuestionId(), question.getQuestionType(), answerSubs.size(), countRatingResult(answerSubs)));
+					break;
+				}
+				case TRUEFALSE:{
+					List<AnswerSub> answerSubs = answerSubRepository.findBySurveyQuestion(question);
+					responseQuestionResultList.add(new ResponseQuestionResultDto(question.getQuestionId(), question.getQuestionType(), answerSubs.size(), countTFResult(answerSubs)));
+					break;
+				}
+				case RADIO:
+				case CHECKBOX: {
 					List<AnswerMulti> answerMultis = answerMultiRepository.findBySurveyQuestion(question);
 					responseQuestionResultList.add(new ResponseQuestionResultDto(question.getQuestionId(), question.getQuestionType(), answerMultis.size(), countMultiResult(question, answerMultis)));
 					break;
+				}
+
 			}
 		}
 
 		ResponseSurveyResultDto responseSurveyResultDto = new ResponseSurveyResultDto(surveyId, attendCount, responseQuestionResultList);
 		return responseSurveyResultDto;
 	}
+
+	private List<AnswerCountDto> countRatingResult(List<AnswerSub> answerSubs) {
+		List<AnswerCountDto> answerCountList = new ArrayList<>();
+
+		Map<String, Integer> frequencyMap = new HashMap<>();
+		for (int i = 1; i <= 5; i++) {
+			frequencyMap.put(String.valueOf(i), 0);
+		}
+
+
+		return getAnswerCountDtos(answerSubs, answerCountList, frequencyMap);
+	}
+	private List<AnswerCountDto> countTFResult(List<AnswerSub> answerSubs) {
+		List<AnswerCountDto> answerCountList = new ArrayList<>();
+
+		Map<String, Integer> frequencyMap = new HashMap<>();
+		frequencyMap.put("true", 0);
+		frequencyMap.put("false", 0);
+
+
+		return getAnswerCountDtos(answerSubs, answerCountList, frequencyMap);
+	}
+
+	private List<AnswerCountDto> getAnswerCountDtos(List<AnswerSub> answerSubs, List<AnswerCountDto> answerCountList, Map<String, Integer> frequencyMap) {
+		for (AnswerSub answerSub : answerSubs) {
+            Integer count = frequencyMap.get(answerSub.getValue());
+            if (count == null) {
+                frequencyMap.put(answerSub.getValue(), 1);
+            } else {
+                frequencyMap.put(answerSub.getValue(), count + 1);
+            }
+		}
+
+		for (Map.Entry<String, Integer> entry : frequencyMap.entrySet()) {
+			String key = entry.getKey();
+			Integer value = entry.getValue();
+			answerCountList.add(new AnswerCountDto(key, value));
+		}
+		return answerCountList;
+	}
+
 	public List<AnswerCountDto> countSubResult(List<AnswerSub> answerSubs){
 		List<AnswerCountDto> answerCountList = new ArrayList<>();
 		for (AnswerSub answerSub : answerSubs) {
