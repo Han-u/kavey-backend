@@ -137,7 +137,13 @@ public class UserService {
 
     public User getUser(HttpServletRequest request) {
 
-        Long kakaoid = (Long) request.getAttribute("kakaoid");
+        System.out.println("================= requsest의 전체 구조 보기 =====================");
+        System.out.println(request);
+
+        System.out.println("================= requsest의 id(userCode) 보기 =====================");
+
+        Long kakaoid = (Long) request.getAttribute("userCode");
+
         System.out.println(kakaoid);
 
         // db 에서 사용자 정보 가져와서 객체에 담기
