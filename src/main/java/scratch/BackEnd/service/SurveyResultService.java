@@ -3,6 +3,8 @@ package scratch.BackEnd.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import scratch.BackEnd.domain.*;
+import scratch.BackEnd.dto.ResponseAllAnswerDto;
+import scratch.BackEnd.dto.ResponseQuestionAnswerDto;
 import scratch.BackEnd.dto.ResponseUserAnswerDto;
 import scratch.BackEnd.dto.ResponseUserAnswerTotalDto;
 import scratch.BackEnd.repository.*;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -62,5 +65,18 @@ public class SurveyResultService {
 		ResponseUserAnswerTotalDto userAnswer = new ResponseUserAnswerTotalDto(user.getId(), surveyId,attendId, responseUserAnswerDtos);
 
 		return userAnswer;
+	}
+
+	public ResponseAllAnswerDto getAllAnswer(Long surveyId) {
+		Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
+		List<SurveyQuestion> surveyQuestions = surveyQuestionRepository.findAllBySurvey(survey);
+
+		List<ResponseQuestionAnswerDto> dtos = surveyQuestions.stream().map(question -> {
+			List<AnswerMulti> answerMultis = answerMultiRepository.findBySurveyQuestion(question);
+			List<AnswerSub> answerSubs = answerSubRepository.findBySurveyQuestion(question);
+			return new ResponseQuestionAnswerDto(question, answerMultis, answerSubs);
+		}).collect(Collectors.toList());
+
+		return new ResponseAllAnswerDto(survey, dtos);
 	}
 }

@@ -41,6 +41,15 @@ spring:
         smtp:
           starttls:
             enable: true
+    default-encoding: UTF-8
+
+  thymeleaf:
+    check-template-location: true
+    prefix: classpath:/mail/
+    suffix: .html
+    mode: HTML5
+    cache: false
+
 
 security:
   oauth2:

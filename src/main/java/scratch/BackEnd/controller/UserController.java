@@ -3,8 +3,11 @@ package scratch.BackEnd.controller;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import scratch.BackEnd.config.jwt.JwtProperties;
+import scratch.BackEnd.domain.User;
 import scratch.BackEnd.dto.kakaoLoginDto.KakaoToken;
 import scratch.BackEnd.service.UserService;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 @RestController
@@ -25,6 +28,7 @@ public class UserController {
         // 넘어온 인가 코드를 통해 access_token 발급
         KakaoToken oauthToken = userService.getAccessToken(code);
 
+
         // 발급 받은 accessToken 으로 카카오 회원 정보 DB 저장
         String jwtToken = userService.SaveUserAndGetToken(oauthToken.getAccess_token());
 
@@ -34,4 +38,9 @@ public class UserController {
         return ResponseEntity.ok().headers(headers).body("success");
     }
 
+    @GetMapping("/me")
+    public User getCurrentUser(HttpServletRequest request) {
+
+        return userService.getUser(request);
+    }
 }
