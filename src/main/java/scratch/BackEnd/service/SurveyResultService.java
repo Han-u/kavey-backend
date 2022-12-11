@@ -57,7 +57,7 @@ public class SurveyResultService {
 
 		responseUserAnswerDtos.sort(Comparator.comparing(ResponseUserAnswerDto::getQuestionId));
 
-		ResponseUserAnswerTotalDto userAnswer = new ResponseUserAnswerTotalDto(user.getId(), surveyId,attendId, responseUserAnswerDtos);
+		ResponseUserAnswerTotalDto userAnswer = new ResponseUserAnswerTotalDto(user.getId(), surveyId,attendId, attend.getGender(), attend.getAge(),responseUserAnswerDtos);
 
 		return userAnswer;
 	}
