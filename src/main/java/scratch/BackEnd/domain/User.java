@@ -1,5 +1,6 @@
 package scratch.BackEnd.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -16,7 +17,8 @@ public class User extends BaseTimeEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy= "user")
+    @JsonIgnore
+    @OneToMany(mappedBy= "user")
     private List<Survey> surveys = new ArrayList<>(); // 읽기만 가능
     private Long kakaoid;
     private String nickname ;
