@@ -110,10 +110,9 @@ public class SurveyService {
     }
 
 
-    public List<SurveyListDto> getSurveyList(String email){
-        User user = userRepository.findByEmail(email);
-        List<Survey> surveyList =  surveyRepository.findByUser(user);
-        return surveyList.stream().map(SurveyListDto::fromEntity).collect(Collectors.toList());
+    @Transactional
+    public List<SurveyListDto> getSurveyList(Long kakaoid){
+        return surveyRepository.findByUserid(kakaoid);
     }
 
     public void deleteSurvey(Long surveyId){

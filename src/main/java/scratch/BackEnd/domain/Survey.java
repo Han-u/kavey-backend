@@ -25,7 +25,7 @@ public class Survey extends BaseTimeEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long surveyId;
     @ManyToOne
-    @JoinColumn(name="user_id")
+    @JoinColumn(name="user_id", referencedColumnName = "id")
     private User user;
 
     @OneToMany(mappedBy= "survey", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval=true)
