@@ -10,7 +10,7 @@ import scratch.BackEnd.type.QuestionType;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+
 
 @Service
 @AllArgsConstructor
@@ -55,7 +55,7 @@ public class SurveyResultService {
 			responseUserAnswerDtos.add(new ResponseUserAnswerDto(user.getId(), answerMulti, findQuestionType(surveyQuestions,answerMulti.getSurveyQuestion().getQuestionId())));
 		}
 
-		Collections.sort(responseUserAnswerDtos, Comparator.comparing(ResponseUserAnswerDto::getQuestionId));
+		responseUserAnswerDtos.sort(Comparator.comparing(ResponseUserAnswerDto::getQuestionId));
 
 		ResponseUserAnswerTotalDto userAnswer = new ResponseUserAnswerTotalDto(user.getId(), surveyId,attendId, responseUserAnswerDtos);
 
@@ -79,26 +79,24 @@ public class SurveyResultService {
 
 		Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
 		List<Attend> attendList = surveyAttendRepository.findBySurvey_SurveyId(surveyId);
-		int attendCount = attendList.size();
+		int attendCount = (int) attendList.stream().filter(attend -> attend.getStatus() == AttendStatus.RESPONSE).count();
 
 		// group by로 해결할 수 있으니 나중에 고민해봄
-
 		List<ResponseQuestionResultDto> responseQuestionResultList = new ArrayList<>();
 		List<SurveyQuestion> surveyQuestions = survey.getSurveyQuestions();
 		for (SurveyQuestion question : surveyQuestions) {
 			switch (question.getQuestionType()) {
-				case TEXT:
-				{
+				case TEXT: {
 					List<AnswerSub> answerSubs = answerSubRepository.findBySurveyQuestion(question);
 					responseQuestionResultList.add(new ResponseQuestionResultDto(question.getQuestionId(), question.getQuestionType(), answerSubs.size(), countSubResult(answerSubs)));
 					break;
 				}
-				case RATING:{
+				case RATING: {
 					List<AnswerSub> answerSubs = answerSubRepository.findBySurveyQuestion(question);
 					responseQuestionResultList.add(new ResponseQuestionResultDto(question.getQuestionId(), question.getQuestionType(), answerSubs.size(), countRatingResult(answerSubs)));
 					break;
 				}
-				case TRUEFALSE:{
+				case TRUEFALSE: {
 					List<AnswerSub> answerSubs = answerSubRepository.findBySurveyQuestion(question);
 					responseQuestionResultList.add(new ResponseQuestionResultDto(question.getQuestionId(), question.getQuestionType(), answerSubs.size(), countTFResult(answerSubs)));
 					break;
@@ -141,12 +139,7 @@ public class SurveyResultService {
 
 	private List<AnswerCountDto> getAnswerCountDtos(List<AnswerSub> answerSubs, List<AnswerCountDto> answerCountList, Map<String, Integer> frequencyMap) {
 		for (AnswerSub answerSub : answerSubs) {
-            Integer count = frequencyMap.get(answerSub.getValue());
-            if (count == null) {
-                frequencyMap.put(answerSub.getValue(), 1);
-            } else {
-                frequencyMap.put(answerSub.getValue(), count + 1);
-            }
+			frequencyMap.merge(answerSub.getValue(), 1, Integer::sum);
 		}
 
 		for (Map.Entry<String, Integer> entry : frequencyMap.entrySet()) {
@@ -172,12 +165,7 @@ public class SurveyResultService {
 		for (QuestionOption i : questionOptions) frequencyMap.put(i.getOptionId(), 0);
 
 		for (AnswerMulti answerMulti : answerMultis) {
-            Integer count = frequencyMap.get(answerMulti.getQuestionOption().getOptionId());
-            if (count == null) {
-                frequencyMap.put(answerMulti.getQuestionOption().getOptionId(), 1);
-            } else {
-                frequencyMap.put(answerMulti.getQuestionOption().getOptionId(), count + 1);
-            }
+			frequencyMap.merge(answerMulti.getQuestionOption().getOptionId(), 1, Integer::sum);
 		}
 
 		for (Map.Entry<Long, Integer> entry : frequencyMap.entrySet()) {

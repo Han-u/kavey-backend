@@ -6,7 +6,7 @@ import scratch.BackEnd.domain.Attend;
 import scratch.BackEnd.domain.SurveyQuestion;
 
 import java.util.List;
-import java.util.Optional;
+
 
 public interface AnswerSubRepository extends JpaRepository<AnswerSub, Long> {
 

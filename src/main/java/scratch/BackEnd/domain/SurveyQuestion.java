@@ -18,7 +18,6 @@ import java.util.List;
 @AllArgsConstructor
 @Where(clause = "is_deleted = false")
 @SQLDelete(sql= "UPDATE survey_question SET is_deleted=true WHERE question_id = ?")
-@ToString
 public class SurveyQuestion extends BaseTimeEntity{
 
     @Id
