@@ -4,11 +4,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import scratch.BackEnd.domain.User;
 import scratch.BackEnd.dto.*;
 import scratch.BackEnd.dto.RequestSurveyDto;
 import scratch.BackEnd.service.SurveyResultService;
 import scratch.BackEnd.service.SurveyService;
+import scratch.BackEnd.service.UserService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +19,7 @@ import java.util.List;
 @RequestMapping("/api/survey")
 @AllArgsConstructor
 public class SurveyController {
+    private final UserService userService;
     private final SurveyService surveyService;
     private final SurveyResultService surveyResultService;
 
@@ -42,9 +46,9 @@ public class SurveyController {
     }
 
     @GetMapping("")
-    public List<SurveyListDto> getSurveyList(){
-        String email = "asf@asdf.com"; // 인증 추가되면 바뀔 부분
-        return surveyService.getSurveyList(email);
+    public List<SurveyListDto> getSurveyList(HttpServletRequest request){
+        User user = userService.getUser(request);
+        return surveyService.getSurveyList(user.getKakaoid());
     }
 
     @DeleteMapping("/{surveyId}")
