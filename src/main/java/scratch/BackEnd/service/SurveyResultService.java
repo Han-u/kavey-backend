@@ -79,7 +79,12 @@ public class SurveyResultService {
 
 		Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new RuntimeException("해당 설문이 없습니다."));
 		List<Attend> attendList = surveyAttendRepository.findBySurvey_SurveyId(surveyId);
-		int attendCount = (int) attendList.stream().filter(attend -> attend.getStatus() == AttendStatus.RESPONSE).count();
+		List<Attend> responsedList = attendList.stream().filter(attend -> attend.getStatus() == AttendStatus.RESPONSE).collect(Collectors.toList());
+		int attendCount = responsedList.size();
+
+		ResponseQuestionResultDto genderResult = new ResponseQuestionResultDto(null,null,attendCount,countGenderResult(responsedList));
+		ResponseQuestionResultDto ageResult = new ResponseQuestionResultDto(null,null,attendCount,countAgeResult(responsedList));
+
 
 		// group by로 해결할 수 있으니 나중에 고민해봄
 		List<ResponseQuestionResultDto> responseQuestionResultList = new ArrayList<>();
@@ -111,9 +116,38 @@ public class SurveyResultService {
 			}
 		}
 
-		ResponseSurveyResultDto responseSurveyResultDto = new ResponseSurveyResultDto(surveyId, attendCount, responseQuestionResultList);
+		ResponseSurveyResultDto responseSurveyResultDto = new ResponseSurveyResultDto(surveyId, attendCount, genderResult, ageResult, responseQuestionResultList);
 		return responseSurveyResultDto;
 	}
+	private List<AnswerCountDto> countGenderResult(List<Attend> attendList) {
+		List<AnswerCountDto> answerCountList = new ArrayList<>();
+
+		Map<String, Integer> frequencyMap = new HashMap<>();
+		frequencyMap.put("MALE", 0);
+		frequencyMap.put("FEMALE", 0);
+
+		return getAnswerCountDto(attendList, answerCountList, frequencyMap);
+	}
+	private List<AnswerCountDto> countAgeResult(List<Attend> attendList) {
+		List<AnswerCountDto> answerCountList = new ArrayList<>();
+		for (Attend attend : attendList) {
+		    answerCountList.add(new AnswerCountDto(attend.getAge(), 1));
+		}
+		return answerCountList;
+	}
+	private List<AnswerCountDto> getAnswerCountDto(List<Attend> attendList, List<AnswerCountDto> answerCountList, Map<String, Integer> frequencyMap) {
+		for (Attend attend : attendList) {
+			frequencyMap.merge(attend.getGender(), 1, Integer::sum);
+		}
+
+		for (Map.Entry<String, Integer> entry : frequencyMap.entrySet()) {
+			String key = entry.getKey();
+			Integer value = entry.getValue();
+			answerCountList.add(new AnswerCountDto(key, value));
+		}
+		return answerCountList;
+	}
+
 
 	private List<AnswerCountDto> countRatingResult(List<AnswerSub> answerSubs) {
 		List<AnswerCountDto> answerCountList = new ArrayList<>();
@@ -124,7 +158,7 @@ public class SurveyResultService {
 		}
 
 
-		return getAnswerCountDtos(answerSubs, answerCountList, frequencyMap);
+		return getAnswerCountDtoList(answerSubs, answerCountList, frequencyMap);
 	}
 	private List<AnswerCountDto> countTFResult(List<AnswerSub> answerSubs) {
 		List<AnswerCountDto> answerCountList = new ArrayList<>();
@@ -133,11 +167,10 @@ public class SurveyResultService {
 		frequencyMap.put("true", 0);
 		frequencyMap.put("false", 0);
 
-
-		return getAnswerCountDtos(answerSubs, answerCountList, frequencyMap);
+		return getAnswerCountDtoList(answerSubs, answerCountList, frequencyMap);
 	}
 
-	private List<AnswerCountDto> getAnswerCountDtos(List<AnswerSub> answerSubs, List<AnswerCountDto> answerCountList, Map<String, Integer> frequencyMap) {
+	private List<AnswerCountDto> getAnswerCountDtoList(List<AnswerSub> answerSubs, List<AnswerCountDto> answerCountList, Map<String, Integer> frequencyMap) {
 		for (AnswerSub answerSub : answerSubs) {
 			frequencyMap.merge(answerSub.getValue(), 1, Integer::sum);
 		}
