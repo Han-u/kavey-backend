@@ -1,4 +1,5 @@
-FROM openjdk:11-jdk
-ARG JAR_FILE=./build/libs/Back-End-0.0.1-SNAPSHOT.jar
-COPY ${JAR_FILE} app.jar
+FROM openjdk:8-jdk-alpine
+VOLUME /tmp
+ADD ./target/batch-visualizer-java-migrator-0.0.1-SNAPSHOT.jar app.jar
+ENV JAVA_OPTS=""
 ENTRYPOINT ["java","-jar","/app.jar"]
