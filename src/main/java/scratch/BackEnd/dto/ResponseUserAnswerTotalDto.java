@@ -13,6 +13,8 @@ public class ResponseUserAnswerTotalDto implements Serializable {
 	private final Long userId;
 	private final Long surveyId;
 	private final Long attendId;
+	private final String gender;
+	private final String age;
 
 	private final List<ResponseUserAnswerDto> responseUserAnswerDtos;
 
