@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.filter.CorsFilter;
 import scratch.BackEnd.config.jwt.CustomAuthenticationEntryPoint;
 import scratch.BackEnd.config.jwt.JwtRequestFilter;
 import scratch.BackEnd.repository.UserRepository;
@@ -24,7 +23,7 @@ public class SecurityConfig {
 
     @Autowired
     UserRepository userRepository;
-    private final CorsFilter corsFilter;
+    private final CorsConfig config;
 
 
     @Bean
@@ -36,11 +35,11 @@ public class SecurityConfig {
                 .and()
                 .httpBasic().disable()
                 .formLogin().disable()
-                .addFilter(corsFilter); // @CrossOrigin(인증X), 시큐리티 필터에 등록 인증(O)
+                .addFilter(config.corsFilter()); // @CrossOrigin(인증X), 시큐리티 필터에 등록 인증(O)
 
         http.authorizeRequests()
-               .antMatchers(FRONT_URL+"/**", BACK_URL+"/**").permitAll() // 접근 허용
-               //.anyRequest().authenticated() // 나머지 모두 인증 필요
+               .antMatchers("/*").authenticated()
+               .anyRequest().permitAll()
 
 
                 .and()

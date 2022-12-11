@@ -140,9 +140,9 @@ public class UserService {
         System.out.println("================= requsest의 전체 구조 보기 =====================");
         System.out.println(request);
 
-        System.out.println("================= requsest의 id(userCode) 보기 =====================");
+        System.out.println("================= requsest의 id(kakaoid) 보기 =====================");
 
-        Long kakaoid = (Long) request.getAttribute("userCode");
+        Long kakaoid = (Long) request.getAttribute("kakaoid");
 
         System.out.println(kakaoid);
 
