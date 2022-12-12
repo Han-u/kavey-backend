@@ -12,6 +12,6 @@ jobs:
       - uses: pixta-dev/repository-mirroring-action@v1 # mirroring
         with:
           target_repo_url:
-           http://210.109.60.59:10152:root/Back-End.git
+           ssh://git@210.109.60.59/:10148/root/Back-End.git
           ssh_private_key:
            ${{ secrets.LEE }}
