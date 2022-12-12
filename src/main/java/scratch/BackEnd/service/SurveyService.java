@@ -170,7 +170,7 @@ public class SurveyService {
      * 설문 참여자가 제출한 설문 응답을 저장한다.
      */
     @Transactional
-    public void submitSurvey(RequestSubmitSurveyDto requestSubmitSurveyDto, Long surveyId, String email) {
+    public void submitSurvey(RequestSubmitSurveyDto requestSubmitSurveyDto, Long surveyId, User user) {
         // 1. 해당 설문지 찾기
         Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
         Attend attend;
@@ -179,16 +179,19 @@ public class SurveyService {
         if (survey.isPrivate()){
             // 1. 폐쇄형인 경우
             // 1-1. 해당 설문에 대한 참여 권한이 있는지
-            attend = surveyAttendRepository.findBySurveyAndSendEmail(survey, email)
+            attend = surveyAttendRepository.findBySurveyAndSendEmail(survey, user.getEmail())
                     .orElseThrow(() -> new CustomException(ErrorCode.DOES_NOT_HAVE_PERMISSION));
             if (attend.getStatus() != AttendStatus.NONRESPONSE){
-                throw new CustomException(ErrorCode.SURVEY_STATUS_IS_NOT_PROGRESS);
+                throw new CustomException(ErrorCode.CANNOT_PARTICIPATE_SURVEY);
             }
             if (survey.isAskAge()){
                 attend.setAge(requestSubmitSurveyDto.getAge());
             }
             if (survey.isAskGender()){
                 attend.setGender(requestSubmitSurveyDto.getGender());
+            }
+            if (attend.getUser()==null){
+                attend.setUser(user);
             }
             attend.setStatus(AttendStatus.RESPONSE);
             attend.setResponseDate(LocalDateTime.now());
@@ -202,14 +205,20 @@ public class SurveyService {
             if (survey.getLimitPerson() <= participants){
                 throw new CustomException(ErrorCode.FIRST_COME_FIRST_SERVED_OVER);
             }
-            Optional<Attend> optionalSurveyAttend = surveyAttendRepository.findBySurveyAndSendEmail(survey, email);
+            Optional<Attend> optionalSurveyAttend = surveyAttendRepository.findBySurveyAndSendEmail(survey, user.getEmail());
             if(optionalSurveyAttend.isPresent()){
                 attend = optionalSurveyAttend.get();
+                if (attend.getStatus() != AttendStatus.NONRESPONSE){
+                    throw new CustomException(ErrorCode.CANNOT_PARTICIPATE_SURVEY);
+                }
                 if (survey.isAskAge()){
                     attend.setAge(requestSubmitSurveyDto.getAge());
                 }
                 if (survey.isAskGender()){
                     attend.setGender(requestSubmitSurveyDto.getGender());
+                }
+                if (attend.getUser()==null){
+                    attend.setUser(user);
                 }
                 attend.setStatus(AttendStatus.RESPONSE);
                 attend.setResponseDate(LocalDateTime.now());
@@ -219,10 +228,11 @@ public class SurveyService {
                         Attend.builder()
                                 .age(requestSubmitSurveyDto.getAge())
                                 .gender(requestSubmitSurveyDto.getGender())
-                                .sendEmail(email)
+                                .sendEmail(user.getEmail())
                                 .status(AttendStatus.RESPONSE)
                                 .survey(survey)
                                 .responseDate(LocalDateTime.now())
+                                .user(user)
                                 .build()
                 );
             }
@@ -234,7 +244,7 @@ public class SurveyService {
         // 3-1. 주관식 저장하기
         List<AnswerSub> answerSubList = requestSubmitSurveyDto.getSurveySubjective().stream()
                         .map(e -> {
-                            SurveyQuestion surveyQuestion = surveyQuestionRepository.findByQuestionIdAndSurvey(e.getQuestionId(), survey).orElseThrow(() -> new RuntimeException("BAD REQUEST"));
+                            SurveyQuestion surveyQuestion = surveyQuestionRepository.findByQuestionIdAndSurvey(e.getQuestionId(), survey).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST_SUBMIT_QUESTION));
                             return new AnswerSub(surveyQuestion, attend, e.getValue());
                         })
                         .collect(Collectors.toList());
@@ -243,8 +253,8 @@ public class SurveyService {
         // 3-2. 객관식 저장하기
         List<AnswerMulti> answerMultiList = requestSubmitSurveyDto.getSurveyMultiple().stream()
                 .map(e -> {
-                    SurveyQuestion surveyQuestion = surveyQuestionRepository.findByQuestionIdAndSurvey(e.getQuestionId(), survey).orElseThrow(() -> new RuntimeException("BAD REQUEST2"));
-                    QuestionOption questionOption = questionOptionRepository.findByOptionIdAndSurveyQuestion(e.getOptionId(), surveyQuestion).orElseThrow(() -> new RuntimeException("BAD REQUEST3"));
+                    SurveyQuestion surveyQuestion = surveyQuestionRepository.findByQuestionIdAndSurvey(e.getQuestionId(), survey).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST_SUBMIT_QUESTION));
+                    QuestionOption questionOption = questionOptionRepository.findByOptionIdAndSurveyQuestion(e.getOptionId(), surveyQuestion).orElseThrow(() ->new CustomException(ErrorCode.BAD_REQUEST_SUBMIT_OPTION));
                     return new AnswerMulti(surveyQuestion, attend, questionOption);
                 })
                 .collect(Collectors.toList());
