@@ -24,10 +24,10 @@ public class SurveyController {
     private final SurveyResultService surveyResultService;
 
     @PostMapping("")
-    public ResponseEntity<?> createSurvey(@RequestBody RequestSurveyDto requestSurveyDto){
+    public Long createSurvey(@RequestBody RequestSurveyDto requestSurveyDto){
         //System.out.println(requestSurveyDto.toString());
-        surveyService.makeSurvey(requestSurveyDto);
-        return ResponseEntity.ok().build();
+        Long surveyId = surveyService.makeSurvey(requestSurveyDto);
+        return surveyId;
     }
 
     @PostMapping("/{surveyId}/edit")
