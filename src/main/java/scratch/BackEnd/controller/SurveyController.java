@@ -24,10 +24,10 @@ public class SurveyController {
     private final SurveyResultService surveyResultService;
 
     @PostMapping("")
-    public String createSurvey(@RequestBody RequestSurveyDto requestSurveyDto){
+    public Long createSurvey(@RequestBody RequestSurveyDto requestSurveyDto){
         //System.out.println(requestSurveyDto.toString());
-        surveyService.makeSurvey(requestSurveyDto);
-        return "";
+        Long surveyId = surveyService.makeSurvey(requestSurveyDto);
+        return surveyId;
     }
 
     @PostMapping("/{surveyId}/edit")
@@ -52,8 +52,9 @@ public class SurveyController {
     }
 
     @DeleteMapping("/{surveyId}")
-    public ResponseEntity<?> deleteSurvey(@PathVariable Long surveyId){
-        surveyService.deleteSurvey(surveyId);
+    public ResponseEntity<?> deleteSurvey(HttpServletRequest request, @PathVariable Long surveyId){
+        User user = userService.getUser(request);
+        surveyService.deleteSurvey(surveyId, user);
         return ResponseEntity.ok().build();
     }
 
@@ -66,9 +67,9 @@ public class SurveyController {
     }
 
     @PostMapping("/{surveyId}/submit")
-    public ResponseEntity<?> submitSurvey(@RequestBody RequestSubmitSurveyDto requestSubmitSurveyDto, @PathVariable Long surveyId){
-        String email = "asf@asdf.com"; // 인증 정보 오면 바뀔 부분
-        surveyService.submitSurvey(requestSubmitSurveyDto, surveyId, email);
+    public ResponseEntity<?> submitSurvey(HttpServletRequest request, @RequestBody RequestSubmitSurveyDto requestSubmitSurveyDto, @PathVariable Long surveyId){
+        User user = userService.getUser(request);
+        surveyService.submitSurvey(requestSubmitSurveyDto, surveyId, user);
         return ResponseEntity.ok().build();
     }
 
@@ -121,5 +122,11 @@ public class SurveyController {
     public ResponseSurveyResultDto getSurveyResult(@PathVariable Long surveyId){
         ResponseSurveyResultDto responseSurveyResultDto = surveyResultService.getSurveyResult(surveyId);
         return responseSurveyResultDto;
+    }
+
+    @PostMapping("/{surveyId}/reject")
+    public ResponseEntity<?> rejectSurvey(@PathVariable Long surveyId, @RequestBody RequestRejectDto dto){
+        surveyService.rejectSurvey(surveyId, dto.getEmail());
+        return ResponseEntity.ok().build();
     }
 }

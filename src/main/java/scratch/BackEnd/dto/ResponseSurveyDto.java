@@ -35,7 +35,7 @@ public class ResponseSurveyDto {
 		this.description = survey.getDescription();
 		this.surveyStartDate = survey.getSurveyStartDate();
 		this.surveyEndDate = survey.getSurveyEndDate();
-		this.isPrivate = survey.isPrivate();
+		this.isPrivate = survey.isPrivateSurvey();
 		this.askGender = survey.isAskGender();
 		this.askAge = survey.isAskAge();
 		this.questionNumber = survey.getQuestionNumber();
