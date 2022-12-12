@@ -43,21 +43,23 @@ public class Survey extends BaseTimeEntity{
 
     @Enumerated(EnumType.STRING)
     private SurveyTheme theme;
-    private boolean isPrivate; //폐쇠,개방
+
+    @Column(name = "is_private")
+    private boolean privateSurvey; //폐쇠,개방
     private boolean askGender; //성별포함
     private boolean askAge; //나이포함
     private boolean isDeleted = Boolean.FALSE;
 
     @Builder
     public Survey(User user, String title, String description, boolean askAge,
-                  boolean askGender, boolean isPrivate, int limitPerson, LocalDateTime startDate, LocalDateTime endDate, int questionNumber, SurveyStatus status, SurveyTheme theme) {
+                  boolean askGender, boolean privateSurvey, int limitPerson, LocalDateTime startDate, LocalDateTime endDate, int questionNumber, SurveyStatus status, SurveyTheme theme) {
         this.user = user;
         this.title = title;
         this.status = status;
         this.description = description;
         this.askAge = askAge;
         this.askGender = askGender;
-        this.isPrivate = isPrivate;
+        this.privateSurvey = privateSurvey;
         this.limitPerson = limitPerson;
         this.surveyStartDate = startDate;
         this.surveyEndDate = endDate;
@@ -73,7 +75,7 @@ public class Survey extends BaseTimeEntity{
         this.description = survey.getDescription();
         this.askAge = survey.isAskAge();
         this.askGender = survey.isAskGender();
-        this.isPrivate = survey.isPrivate();
+        this.privateSurvey = survey.isPrivateSurvey();
         this.limitPerson = survey.getLimitPerson();
         this.surveyStartDate = survey.getSurveyStartDate();
         this.surveyEndDate = survey.getSurveyEndDate();

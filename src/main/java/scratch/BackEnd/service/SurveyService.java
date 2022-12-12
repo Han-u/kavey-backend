@@ -176,7 +176,7 @@ public class SurveyService {
         Attend attend;
         isValidSurvey(survey);
 
-        if (survey.isPrivate()){
+        if (survey.isPrivateSurvey()){
             // 1. 폐쇄형인 경우
             // 1-1. 해당 설문에 대한 참여 권한이 있는지
             attend = surveyAttendRepository.findBySurveyAndSendEmail(survey, user.getEmail())

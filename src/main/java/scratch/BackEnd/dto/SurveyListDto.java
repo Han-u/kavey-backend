@@ -23,7 +23,7 @@ public class SurveyListDto {
         this.surveyId = survey.getSurveyId();
         this.userid = survey.getUser().getId();
         this.title = survey.getTitle();
-        this.isPrivate = survey.isPrivate();
+        this.isPrivate = survey.isPrivateSurvey();
         this.limitPerson = survey.getLimitPerson();
         this.surveyStartDate = survey.getSurveyStartDate();
         this.surveyEndDate = survey.getSurveyEndDate();
