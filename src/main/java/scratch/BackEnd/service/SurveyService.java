@@ -202,7 +202,7 @@ public class SurveyService {
             // 2. 오픈형인 경우
             // 2-1. 참여 제한에 걸려있는지?
             int participants = surveyAttendRepository.countBySurveyAndStatus(survey, AttendStatus.RESPONSE);
-            if (survey.getLimitPerson() <= participants){
+            if (survey.getLimitPerson() > 0 && survey.getLimitPerson() <= participants){
                 throw new CustomException(ErrorCode.FIRST_COME_FIRST_SERVED_OVER);
             }
             Optional<Attend> optionalSurveyAttend = surveyAttendRepository.findBySurveyAndSendEmail(survey, user.getEmail());
