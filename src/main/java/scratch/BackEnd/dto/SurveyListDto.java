@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 public class SurveyListDto {
+    private Long surveyId;
     private Long userid;
     private String title;
     private boolean isPrivate;
@@ -19,6 +20,7 @@ public class SurveyListDto {
 
 
     public SurveyListDto (Survey survey){
+        this.surveyId = survey.getSurveyId();
         this.userid = survey.getUser().getId();
         this.title = survey.getTitle();
         this.isPrivate = survey.isPrivate();
