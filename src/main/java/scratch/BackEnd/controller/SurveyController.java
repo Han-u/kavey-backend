@@ -24,10 +24,10 @@ public class SurveyController {
     private final SurveyResultService surveyResultService;
 
     @PostMapping("")
-    public String createSurvey(@RequestBody RequestSurveyDto requestSurveyDto){
+    public ResponseEntity<?> createSurvey(@RequestBody RequestSurveyDto requestSurveyDto){
         //System.out.println(requestSurveyDto.toString());
         surveyService.makeSurvey(requestSurveyDto);
-        return "";
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{surveyId}/edit")
@@ -52,8 +52,9 @@ public class SurveyController {
     }
 
     @DeleteMapping("/{surveyId}")
-    public ResponseEntity<?> deleteSurvey(@PathVariable Long surveyId){
-        surveyService.deleteSurvey(surveyId);
+    public ResponseEntity<?> deleteSurvey(HttpServletRequest request, @PathVariable Long surveyId){
+        User user = userService.getUser(request);
+        surveyService.deleteSurvey(surveyId, user);
         return ResponseEntity.ok().build();
     }
 
