@@ -25,7 +25,6 @@ public class SurveyController {
 
     @PostMapping("")
     public Long createSurvey(@RequestBody RequestSurveyDto requestSurveyDto){
-        //System.out.println(requestSurveyDto.toString());
         Long surveyId = surveyService.makeSurvey(requestSurveyDto);
         return surveyId;
     }
