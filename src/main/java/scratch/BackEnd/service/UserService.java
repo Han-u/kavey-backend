@@ -16,6 +16,8 @@ import scratch.BackEnd.config.jwt.JwtProperties;
 import scratch.BackEnd.dto.kakaoLoginDto.KakaoProfile;
 import scratch.BackEnd.dto.kakaoLoginDto.KakaoToken;
 import scratch.BackEnd.domain.User;
+import scratch.BackEnd.exception.CustomException;
+import scratch.BackEnd.exception.ErrorCode;
 import scratch.BackEnd.repository.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
@@ -144,11 +146,14 @@ public class UserService {
 
         Long kakaoid = (Long) request.getAttribute("kakaoid");
 
+        if(kakaoid==null){
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
         System.out.println(kakaoid);
-
         // db 에서 사용자 정보 가져와서 객체에 담기
         User user = userRepository.findByKakaoid(kakaoid)
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 없습니다. id=" + kakaoid));
+                .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
+        System.out.println(user.getEmail());
 
         return user;
     }

@@ -22,7 +22,7 @@ public enum ErrorCode {
     CANNOT_PARTICIPATE_SURVEY(400, "S013", "이미 참여했거나, 거절한 설문입니다."),
 
 
-
+    UNAUTHORIZED(401, "U000", "인증 토큰이 올바르지 않습니다."),
     USER_NOT_FOUND(404, "U001", "유저를 찾을 수 없습니다"),
     DOES_NOT_HAVE_PERMISSION(400, "U002", "권한이 없습니다."),
     UNABLE_TO_ANSWER(400, "U003", "응답할 수 없는 설문입니다.");
