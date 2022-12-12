@@ -17,9 +17,10 @@ public class SurveyListDto {
     private LocalDateTime surveyEndDate;
     private LocalDateTime earlyEndDate;
     private SurveyStatus status;
+    private int participants;
 
 
-    public SurveyListDto (Survey survey){
+    public SurveyListDto (Survey survey, int participants){
         this.surveyId = survey.getSurveyId();
         this.userid = survey.getUser().getId();
         this.title = survey.getTitle();
@@ -29,6 +30,7 @@ public class SurveyListDto {
         this.surveyEndDate = survey.getSurveyEndDate();
         this.earlyEndDate = survey.getEarlyEndDate();
         this.status = survey.getStatus();
+        this.participants = participants;
 
     }
 }

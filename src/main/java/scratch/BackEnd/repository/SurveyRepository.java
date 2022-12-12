@@ -18,7 +18,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Long> {
 
     List<Survey> findAll();
     @Query("SELECT s FROM Survey s WHERE s.user.kakaoid=:kakaoid")
-    List<SurveyListDto> findByUserid(@Param("kakaoid") Long kakaoid);
+    List<Survey> findByUserid(@Param("kakaoid") Long kakaoid);
 
 
 }

@@ -109,7 +109,12 @@ public class SurveyService {
 
     @Transactional
     public List<SurveyListDto> getSurveyList(Long kakaoid){
-        return surveyRepository.findByUserid(kakaoid);
+        List<Survey> surveyList = surveyRepository.findByUserid(kakaoid);
+        List<SurveyListDto> dto =surveyList.stream().map(survey -> {
+            int participants = surveyAttendRepository.countBySurveyAndStatus(survey, AttendStatus.RESPONSE);
+            return new SurveyListDto(survey, participants);
+        }).collect(Collectors.toList());
+        return dto;
     }
 
     public void deleteSurvey(Long surveyId, User user){
