@@ -17,18 +17,20 @@ public class SurveyListDto {
     private LocalDateTime surveyEndDate;
     private LocalDateTime earlyEndDate;
     private SurveyStatus status;
+    private int participants;
 
 
-    public SurveyListDto (Survey survey){
+    public SurveyListDto (Survey survey, int participants){
         this.surveyId = survey.getSurveyId();
         this.userid = survey.getUser().getId();
         this.title = survey.getTitle();
-        this.isPrivate = survey.isPrivate();
+        this.isPrivate = survey.isPrivateSurvey();
         this.limitPerson = survey.getLimitPerson();
         this.surveyStartDate = survey.getSurveyStartDate();
         this.surveyEndDate = survey.getSurveyEndDate();
         this.earlyEndDate = survey.getEarlyEndDate();
         this.status = survey.getStatus();
+        this.participants = participants;
 
     }
 }

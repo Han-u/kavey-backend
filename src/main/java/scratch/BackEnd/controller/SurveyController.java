@@ -123,4 +123,10 @@ public class SurveyController {
         ResponseSurveyResultDto responseSurveyResultDto = surveyResultService.getSurveyResult(surveyId);
         return responseSurveyResultDto;
     }
+
+    @PostMapping("/{surveyId}/reject")
+    public ResponseEntity<?> rejectSurvey(@PathVariable Long surveyId, @RequestBody RequestRejectDto dto){
+        surveyService.rejectSurvey(surveyId, dto.getEmail());
+        return ResponseEntity.ok().build();
+    }
 }

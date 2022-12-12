@@ -6,6 +6,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum ErrorCode {
+    BAD_REQUEST(400, "S000", "잘못된 요청입니다."),
     SURVEY_NOT_FOUND(404, "S001", "설문을 찾을 수 없습니다."),
     PROGRESS_CANNOT_BE_MODIFIED(400, "S002", "진행 중인 설문은 수정이 불가능합니다."),
     PROGRESS_CANNOT_BE_DELETE(400, "S003", "진행 중인 설문은 삭제가 불가능합니다."),

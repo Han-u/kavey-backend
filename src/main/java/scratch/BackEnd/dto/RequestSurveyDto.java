@@ -20,7 +20,7 @@ public class RequestSurveyDto {
 	private String description;
 	private boolean askAge;
 	private boolean askGender;
-	private boolean isPrivate;
+	private boolean privateSurvey;
 	private int limitPerson;
 	private LocalDateTime startDate;
 	private LocalDateTime endDate;
@@ -37,7 +37,7 @@ public class RequestSurveyDto {
 				.status(status)
 				.askAge(askAge)
 				.askGender(askGender)
-				.isPrivate(isPrivate)
+				.privateSurvey(privateSurvey)
 				.limitPerson(limitPerson)
 				.surveyStartDate(startDate)
 				.surveyEndDate(endDate)

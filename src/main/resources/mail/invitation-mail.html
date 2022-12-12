@@ -230,15 +230,19 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
         
   <!--[if mso]><style>.v-button {background: transparent !important;}</style><![endif]-->
 <div align="center">
-  <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://unlayer.com/" style="height:41px; v-text-anchor:middle; width:162px;" arcsize="10%"  stroke="f" fillcolor="#190e90"><w:anchorlock/><center style="color:#FFFFFF;font-family:arial,helvetica,sans-serif;"><![endif]-->  
-    <a href="https://unlayer.com/" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;font-family:arial,helvetica,sans-serif;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #FFFFFF; background-color: #190e90; border-radius: 4px;-webkit-border-radius: 4px; -moz-border-radius: 4px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;">
+  <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://unlayer.com/" style="height:41px; v-text-anchor:middle; width:162px;" arcsize="10%"  stroke="f" fillcolor="#190e90"><w:anchorlock/><center style="color:#FFFFFF;font-family:arial,helvetica,sans-serif;"><![endif]-->
+    <a th:href="${surveyLink}" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;font-family:arial,helvetica,sans-serif;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #FFFFFF; background-color: #190e90; border-radius: 4px;-webkit-border-radius: 4px; -moz-border-radius: 4px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;">
       <span style="display:block;padding:12px 30px;line-height:120%;"><span style="font-family: Lato, sans-serif; font-size: 14px; line-height: 16.8px;"><strong><span style="font-size: 14px; line-height: 16.8px;">설문 링크 바로가기</span></strong></span></span>
     </a>
   <!--[if mso]></center></v:roundrect><![endif]-->
 </div>
-
       </td>
     </tr>
+  <tr>
+    <td style="display: flex; justify-content: center;">
+      <a th:href="${rejectLink}" style="color: gray">설문 거절하기</a>
+    </td>
+  </tr>
   </tbody>
 </table>
 

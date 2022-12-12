@@ -109,7 +109,12 @@ public class SurveyService {
 
     @Transactional
     public List<SurveyListDto> getSurveyList(Long kakaoid){
-        return surveyRepository.findByUserid(kakaoid);
+        List<Survey> surveyList = surveyRepository.findByUserid(kakaoid);
+        List<SurveyListDto> dto =surveyList.stream().map(survey -> {
+            int participants = surveyAttendRepository.countBySurveyAndStatus(survey, AttendStatus.RESPONSE);
+            return new SurveyListDto(survey, participants);
+        }).collect(Collectors.toList());
+        return dto;
     }
 
     public void deleteSurvey(Long surveyId, User user){
@@ -176,7 +181,7 @@ public class SurveyService {
         Attend attend;
         isValidSurvey(survey);
 
-        if (survey.isPrivate()){
+        if (survey.isPrivateSurvey()){
             // 1. 폐쇄형인 경우
             // 1-1. 해당 설문에 대한 참여 권한이 있는지
             attend = surveyAttendRepository.findBySurveyAndSendEmail(survey, user.getEmail())
@@ -202,7 +207,7 @@ public class SurveyService {
             // 2. 오픈형인 경우
             // 2-1. 참여 제한에 걸려있는지?
             int participants = surveyAttendRepository.countBySurveyAndStatus(survey, AttendStatus.RESPONSE);
-            if (survey.getLimitPerson() <= participants){
+            if (survey.getLimitPerson() > 0 && survey.getLimitPerson() <= participants){
                 throw new CustomException(ErrorCode.FIRST_COME_FIRST_SERVED_OVER);
             }
             Optional<Attend> optionalSurveyAttend = surveyAttendRepository.findBySurveyAndSendEmail(survey, user.getEmail());
@@ -301,7 +306,7 @@ public class SurveyService {
         // 이메일 전송하는 부분 나중에 수정
         String[] emailList = {dto.getEmail()};
         HashMap<String, String> emailValues = getEmailInviteContext(survey);
-        mailUtil.sendSurveyInviteMail(emailValues, emailList);
+        mailUtil.sendSurveyInviteMail(emailValues, emailList,surveyId);
 
 
         // 추가함
@@ -367,7 +372,7 @@ public class SurveyService {
         String[] emailList = userList.stream().map(Attend::getSendEmail).toArray(String[]::new);
         HashMap<String, String> emailValues = getEmailInviteContext(survey);
 
-        mailUtil.sendSurveyInviteMail(emailValues, emailList);
+        mailUtil.sendSurveyInviteMail(emailValues, emailList,surveyId);
 
 
 
@@ -421,7 +426,7 @@ public class SurveyService {
         // 3. email 일괄 전송
         String[] emailList = sendEmails.toArray(new String[0]);
         HashMap<String, String> emailValues = getEmailInviteContext(survey);
-        mailUtil.sendSurveyInviteMail(emailValues, emailList);
+        mailUtil.sendSurveyInviteMail(emailValues, emailList, surveyId);
     }
 
 
@@ -444,5 +449,12 @@ public class SurveyService {
             userList.add(attend.getSendEmail());
         }
         return userList;
+    }
+
+    public void rejectSurvey(Long surveyId, String email){
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
+        Attend attend = surveyAttendRepository.findBySurveyAndSendEmail(survey, email).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
+        attend.setStatus(AttendStatus.REJECT);
+        surveyAttendRepository.save(attend);
     }
 }

@@ -18,18 +18,18 @@ import java.util.HashMap;
 @Component
 public class MailUtil {
     private final JavaMailSender javaMailSender;
-    private static final String FROM_ADDRESS = "viewer2323@gmail.com";
+    public static final String FRONT_URL = "http://localhost:3000";
+
 
     private final SpringTemplateEngine templateEngine;
 
     @Async
-    public void bulkSendMail(String[] mails, String subject, String text, HashMap<String, String> inlines){
+    public void sendMail(String mail, String subject, String text, HashMap<String, String> inlines){
 
         MimeMessagePreparator msg = mimeMessage -> {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-            mimeMessageHelper.setTo(FROM_ADDRESS);
+            mimeMessageHelper.setTo(mail);
             mimeMessageHelper.setSubject(subject);
-            mimeMessageHelper.setBcc(mails);
             mimeMessageHelper.setText(text, true);
 
             if(!inlines.isEmpty()){
@@ -50,20 +50,24 @@ public class MailUtil {
     }
 
     @Async
-    public void sendSurveyInviteMail(HashMap<String, String> values, String[] toList){
+    public void sendSurveyInviteMail(HashMap<String, String> values, String[] toList, Long surveyId){
         String invitationMail = "invitation-mail";
-
-        Context context = new Context();
-        values.forEach(context::setVariable);
-
-        String html = templateEngine.process(invitationMail, context);
 
         HashMap<String, String> inlineValues = new HashMap<>();
 
         inlineValues.put("image1", "mail/images/image-1.png");
         inlineValues.put("image2", "mail/images/image-2.png");
 
-        bulkSendMail(toList, "[Kavey] 설문에 응답해주세요!", html, inlineValues);
+        for (String email: toList) {
+            Context context = new Context();
+            values.forEach(context::setVariable);
+            context.setVariable("surveyLink", FRONT_URL+"/answer/"+surveyId);
+            context.setVariable("rejectLink", FRONT_URL+"/reject?surveyId="+surveyId+"&email="+email);
+
+            String html = templateEngine.process(invitationMail, context);
+            sendMail(email, "[Kavey] 설문에 응답해주세요!", html, inlineValues);
+        }
+
     }
 
 
