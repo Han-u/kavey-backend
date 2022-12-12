@@ -2,9 +2,11 @@ name: Sync this repository to another repository
  
 on:
   push:
-    branches: [ "main","develop" ]
+    branches: 
+    - "**" 
   pull_request:
-    branches: [ "main","develop"  ]
+    branches: 
+    - "**"
 
  
   # Allows you to run this workflow manually from the Actions tab
