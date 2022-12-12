@@ -301,7 +301,7 @@ public class SurveyService {
         // 이메일 전송하는 부분 나중에 수정
         String[] emailList = {dto.getEmail()};
         HashMap<String, String> emailValues = getEmailInviteContext(survey);
-        mailUtil.sendSurveyInviteMail(emailValues, emailList);
+        mailUtil.sendSurveyInviteMail(emailValues, emailList,surveyId);
 
 
         // 추가함
@@ -367,7 +367,7 @@ public class SurveyService {
         String[] emailList = userList.stream().map(Attend::getSendEmail).toArray(String[]::new);
         HashMap<String, String> emailValues = getEmailInviteContext(survey);
 
-        mailUtil.sendSurveyInviteMail(emailValues, emailList);
+        mailUtil.sendSurveyInviteMail(emailValues, emailList,surveyId);
 
 
 
@@ -421,7 +421,7 @@ public class SurveyService {
         // 3. email 일괄 전송
         String[] emailList = sendEmails.toArray(new String[0]);
         HashMap<String, String> emailValues = getEmailInviteContext(survey);
-        mailUtil.sendSurveyInviteMail(emailValues, emailList);
+        mailUtil.sendSurveyInviteMail(emailValues, emailList, surveyId);
     }
 
 
@@ -444,5 +444,12 @@ public class SurveyService {
             userList.add(attend.getSendEmail());
         }
         return userList;
+    }
+
+    public void rejectSurvey(Long surveyId, String email){
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
+        Attend attend = surveyAttendRepository.findBySurveyAndSendEmail(survey, email).orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST));
+        attend.setStatus(AttendStatus.REJECT);
+        surveyAttendRepository.save(attend);
     }
 }
