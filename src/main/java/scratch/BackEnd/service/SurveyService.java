@@ -14,10 +14,7 @@ import scratch.BackEnd.type.SurveyStatus;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -115,22 +112,20 @@ public class SurveyService {
         return surveyRepository.findByUserid(kakaoid);
     }
 
-    public void deleteSurvey(Long surveyId){
+    public void deleteSurvey(Long surveyId, User user){
         // 설문지 조회
         Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new CustomException(ErrorCode.SURVEY_NOT_FOUND));
-
-        // 해당 유저에게 권한이 있는지 확인
-        // 카카오 인증 추가되면 수정함
-//        User user = survey.getUser();
-//        if (!Objects.equals(user.getEmail(), "asf@asdf.com")){
-//            throw new RuntimeException("권한이 없습니다.");
-//        }
+//         해당 유저에게 권한이 있는지 확인
+        User surveyCreator = survey.getUser();
+        if (!Objects.equals(surveyCreator.getEmail(), user.getEmail())){
+            throw new CustomException(ErrorCode.DOES_NOT_HAVE_PERMISSION);
+        }
 
         // 설문하는 동안에는 삭제 못하도록함
         if (survey.getStatus() == SurveyStatus.PROGRESS){
             throw new CustomException(ErrorCode.PROGRESS_CANNOT_BE_MODIFIED);
         }
-//        surveyScheduler.removeSurveySchedule(survey);       //스케줄에서 삭제
+
         removeSurveySchedule(survey);       //스케줄에서 삭제
         surveyRepository.deleteById(surveyId);
     }

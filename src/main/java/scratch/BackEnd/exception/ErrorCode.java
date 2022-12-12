@@ -20,7 +20,7 @@ public enum ErrorCode {
 
 
     USER_NOT_FOUND(404, "U001", "유저를 찾을 수 없습니다"),
-    DOES_NOT_HAVE_PERMISSION(400, "U002", "참여 권한이 없습니다."),
+    DOES_NOT_HAVE_PERMISSION(400, "U002", "권한이 없습니다."),
     UNABLE_TO_ANSWER(400, "U003", "응답할 수 없는 설문입니다.");
 
 
